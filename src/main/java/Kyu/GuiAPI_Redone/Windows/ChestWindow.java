@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class ChestWindow extends DefaultWindow{
 
-    protected ChestWindow(String title, int rows) {
-        super(title, rows);
+    public ChestWindow(String title, int rows, GUI gui) {
+        super(title, rows, gui);
     }
 }

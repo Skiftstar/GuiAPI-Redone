@@ -15,4 +15,15 @@ public class GuiItem {
         this.slot = slot;
     }
 
+    public ItemStack getItemStack() {
+        return item;
+    }
+
+    public int getSlot() {
+        return slot;
+    }
+
+    public Window getParentWindow() {
+        return parentWindow;
+    }
 }

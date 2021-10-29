@@ -21,6 +21,8 @@ public interface Window {
 
     ItemStack getItem(int slot);
 
+    GuiItem getGuiItem(int slot);
+
     String getTitle();
 
     Player getHolder();
