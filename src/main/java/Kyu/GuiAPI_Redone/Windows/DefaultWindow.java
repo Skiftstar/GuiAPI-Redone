@@ -11,40 +11,44 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-abstract class DefaultWindow implements Window {
+abstract class DefaultWindow implements Window, Listener {
 
     private String title;
     private Map<Integer, GuiItem[]> pages = new HashMap<>();
     private int rows;
-    private boolean isMultiPage = false;
+    private boolean isMultiPage = false, preventItemGrab = true;
     private int currPage;
     private GUI gui;
     private Inventory inv;
 
-    /**
-     * Creates a new Default (Chest) Window
-     * @param title Title of the Window
-     * @param rows Amount of rows. Throws Exception if out of bounds
-     * @param gui GUI the window is part of
-     */
-    protected DefaultWindow(String title, int rows, GUI gui) {
+    protected DefaultWindow(@Nullable String title, int rows, GUI gui, JavaPlugin plugin) {
         this.title = title;
         this.gui = gui;
         if (rows < 0 || rows > 6) {
             throw new RowsOutOfBoundsException();
         }
-        inv = Bukkit.createInventory(gui.getHolder(), rows * 9);
+        if (title == null) {
+            inv = Bukkit.createInventory(gui.getHolder(), rows * 9);
+        } else {
+            inv = Bukkit.createInventory(gui.getHolder(), rows * 9, Component.text(Util.color(title)));
+        }
         this.rows = rows;
         pages.put(1, new GuiItem[rows * 9]);
         currPage = 1;
+
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     /*
@@ -60,6 +64,7 @@ abstract class DefaultWindow implements Window {
      * Opens the window
      */
     public void open() {
+        refreshWindow();
         gui.getHolder().openInventory(inv);
     }
 
@@ -88,6 +93,7 @@ abstract class DefaultWindow implements Window {
         checkSlotBounds(slot);
         GuiItem gItem = new GuiItem(item, slot, this);
         pages.get(currPage)[slot] = gItem;
+        inv.setItem(slot, item);
         return gItem;
     }
 
@@ -101,16 +107,14 @@ abstract class DefaultWindow implements Window {
     public GuiItem setItem(Material itemType, @Nullable String name, int slot) {
         checkSlotBounds(slot);
         ItemStack is = new ItemStack(itemType);
-        GuiItem gItem;
-        if (name == null) {
-            gItem = new GuiItem(is, slot, this);
-        } else {
+        if (name != null) {
             ItemMeta im = is.getItemMeta();
             im.displayName(Component.text(Util.color(name)));
             is.setItemMeta(im);
-            gItem = new GuiItem(is, slot, this);
         }
+        GuiItem gItem = new GuiItem(is, slot, this);
         pages.get(currPage)[slot] = gItem;
+        inv.setItem(slot, is);
         return gItem;
     }
 
@@ -123,7 +127,13 @@ abstract class DefaultWindow implements Window {
      * @return Added Item as GuiItem
      */
     public GuiItem setItemAtPage(ItemStack item, int slot, int page) {
-        return null;
+        checkMultiPage();
+        checkPageBounds(page);
+        checkSlotBounds(slot);
+
+        GuiItem gItem = new GuiItem(item, slot, this);
+        pages.get(page)[slot] = gItem;
+        return gItem;
     }
 
     /**
@@ -136,7 +146,18 @@ abstract class DefaultWindow implements Window {
      * @return Added Item as GuiItem
      */
     public GuiItem setItemAtPage(Material itemType, @Nullable String name, int slot, int page) {
-        return null;
+        checkMultiPage();
+        checkPageBounds(page);
+        checkSlotBounds(slot);
+        ItemStack is = new ItemStack(itemType);
+        if (name != null) {
+            ItemMeta im = is.getItemMeta();
+            im.displayName(Component.text(Util.color(name)));
+            is.setItemMeta(im);
+        }
+        GuiItem gItem = new GuiItem(is, slot, this);
+        pages.get(page)[slot] = gItem;
+        return gItem;
     }
 
     /**
@@ -146,6 +167,7 @@ abstract class DefaultWindow implements Window {
     public void removeItem(int slot) {
         checkSlotBounds(slot);
         pages.get(currPage)[slot] = null;
+        inv.setItem(slot, new ItemStack(Material.AIR));
     }
 
     /**
@@ -245,6 +267,8 @@ abstract class DefaultWindow implements Window {
 
     /**
      * Changes whether the inventory is allowed to have multiple pages
+     * If set from true to false, the current Page will be set to 1
+     * the other pages will not be deleted tho
      * @param value
      */
     public void setMultiPage(boolean value) {
@@ -271,7 +295,13 @@ abstract class DefaultWindow implements Window {
      * Reloads all Items on the current page
      */
     public void refreshWindow() {
-
+        GuiItem[] items = pages.get(currPage);
+        for (int i = 0; i < items.length; i++) {
+            if (items[i] == null) {
+                continue;
+            }
+            inv.setItem(i, items[i].getItemStack());
+        }
     }
 
     /*
@@ -281,6 +311,22 @@ abstract class DefaultWindow implements Window {
 
     =============================================================================
      */
+
+    /**
+     * Set whether taking items from the inventory should be prevented
+     * @param value
+     */
+    public void setPreventItemGrab(boolean value) {
+        preventItemGrab = value;
+    }
+
+    /**
+     *
+     * @return Whether taking items from the inventory is prevented
+     */
+    public boolean isPreventItemGrab() {
+        return preventItemGrab;
+    }
 
     /**
      *
@@ -295,7 +341,7 @@ abstract class DefaultWindow implements Window {
      * @return Inventory Holder
      */
     public Player getHolder() {
-        return null;
+        return gui.getHolder();
     }
 
     /**
@@ -303,7 +349,7 @@ abstract class DefaultWindow implements Window {
      * @return GUI the Window is part of
      */
     public GUI getGUI() {
-        return null;
+        return gui;
     }
 
     /**
@@ -349,5 +395,35 @@ abstract class DefaultWindow implements Window {
         }
     }
 
+        /*
+    =============================================================================
+
+                                Event Handler
+
+    =============================================================================
+     */
+
+    @EventHandler
+    private void onInvClick(InventoryClickEvent e) {
+        System.out.println("Called");
+        if (e.getClickedInventory() == null || !e.getClickedInventory().equals(inv)) {
+            return;
+        }
+        if (!e.getWhoClicked().equals(getHolder())) {
+            return;
+        }
+        if (e.getCurrentItem().getType().equals(Material.AIR)) {
+            return;
+        }
+        if (preventItemGrab) {
+            e.setCancelled(true);
+        }
+        int slot = e.getSlot();
+        GuiItem item = pages.get(currPage)[slot];
+        if (item == null) {
+            return;
+        }
+        item.executeOnClick(e);
+    }
 
 }
