@@ -1,0 +1,4 @@
+name: GuiAPI Redone
+version: '${project.version}'
+main: Kyu.GuiAPI_Redone.Main
+api-version: 1.17
