@@ -26,13 +26,18 @@ public class KyuTestCommand implements CommandExecutor {
         Player p = (Player) sender;
         GUI gui = new GUI(p, plugin);
         ChestWindow window = gui.createChestWindow("test", 6);
-        GuiItem item = window.setItem(Material.FEATHER, "&ctest", 15);
+        window.setMultiPage(true);
+        GuiItem item = window.setItem(Material.FEATHER, "&cAdd Page", 15);
         item.setOnClick(e -> {
-            e.getWhoClicked().sendMessage(Component.text("Moin."));
+            window.addPage();
         });
-        GuiItem item2 = window.setItem(Material.REDSTONE, "&aremove Item", 14);
+        GuiItem item2 = window.setItem(Material.REDSTONE, "&aremove second to last Page", 14);
         item2.setOnClick(e -> {
-            window.removeItem(15);
+            window.removePage(window.getPages().size() - 1);
+        });
+        GuiItem item3 = window.setItem(Material.REDSTONE_TORCH, "&aremove last Page", 13);
+        item3.setOnClick(e -> {
+            window.removePage(window.getPages().size());
         });
         window.open();
         return true;

@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,10 +33,12 @@ abstract class DefaultWindow implements Window {
     private int rows;
     private Map<Integer, GuiItem[]> pages = new HashMap<>();
     private int currPage;
-    private boolean isMultiPage = false, preventItemGrab = true, preventItemPlace = true;
+    private boolean isMultiPage = false, preventItemGrab = true, preventItemPlace = true, taskBarEnabled = false;
 
+    private ItemStack nextPage, prevPage;
 
     protected DefaultWindow(@Nullable String title, int rows, GUI gui, JavaPlugin plugin) {
+        generateDefaultPlaceholders();
         this.title = title;
         this.gui = gui;
         if (rows < 0 || rows > 6) {
@@ -234,6 +237,9 @@ abstract class DefaultWindow implements Window {
     public void addPage() {
         checkMultiPage();
         pages.put(pages.size() + 1, new GuiItem[rows * 9]);
+
+        setPlaceholders(pages.size() - 1);
+        setPlaceholders(pages.size());
     }
 
     /**
@@ -246,6 +252,48 @@ abstract class DefaultWindow implements Window {
         checkMultiPage();
         checkPageBounds(page);
         pages.remove(page);
+        if (pages.size() == 0) {
+            pages.put(1, new GuiItem[rows * 9]);
+        }
+        fillEmptyPageSpots();
+
+        for (int i : pages.keySet()) {
+            setPlaceholders(i);
+        }
+
+        //If last page is removed and user is on last, set current Page to *new* last page
+        if (getCurrentPage() > pages.size()) {
+            setPage(pages.size());
+            refreshWindow();
+        }
+        //Also refresh window if page the user was on is removed
+        //Say user is on page 5/6 and page 5 is removed, then user is on still page 5, but
+        //It's not the same Page 5, so it needs to be refreshed
+        else if (getCurrentPage() == page) {
+            refreshWindow();
+        }
+    }
+
+    /**
+     * Moves later pages to the front to fill empty spots
+     * Changes Page numbers obviously
+     */
+    public void fillEmptyPageSpots() {
+        //Approach presupposes that only one page at a time is removed before this function is called
+        int page = 1;
+        while (true) {
+            if (pages.get(page) == null && pages.get(page + 1) != null) {
+                while (pages.get(page + 1) != null) {
+                    pages.put(page, pages.get(page +1));
+                    pages.remove(page + 1);
+                    page++;
+                }
+                break;
+            }
+            page++;
+            //Prevent overflow and handle edge case of last page being removed
+            if (page > pages.size() + 1) break;
+        }
     }
 
     /**
@@ -290,10 +338,19 @@ abstract class DefaultWindow implements Window {
      * Changes whether the inventory is allowed to have multiple pages
      * If set from true to false, the current Page will be set to 1
      * the other pages will not be deleted tho
+     * Will move Items on Page 1 to make space for PageChanger Placeholders
      * @param value
      */
     public void setMultiPage(boolean value) {
         isMultiPage = value;
+        if (!value) {
+            currPage = 1;
+            refreshWindow();
+        } else {
+            for (int i : pages.keySet()) {
+                setPlaceholders(i);
+            }
+        }
     }
 
     /**
@@ -325,10 +382,13 @@ abstract class DefaultWindow implements Window {
      */
     public void refreshWindow() {
         GuiItem[] items = pages.get(currPage);
+        System.out.println(Arrays.toString(items));
         for (int i = 0; i < items.length; i++) {
             if (items[i] == null) {
+                inv.setItem(i, new ItemStack(Material.AIR));
                 continue;
             }
+            System.out.println(items[i].getItemStack().getType());
             inv.setItem(i, items[i].getItemStack());
         }
     }
@@ -424,6 +484,34 @@ abstract class DefaultWindow implements Window {
     =============================================================================
      */
 
+    void setPlaceholders(int page) {
+        GuiItem gNextPage = null, gPrevPage = null;
+        if (page == 1) {
+            if (pages.size() < 2) {
+                return;
+            }
+            gNextPage = setItemAtPage(nextPage, rows * 9 - 1, page);
+        } else if (pages.get(page + 1) == null) {
+            gPrevPage = setItemAtPage(prevPage, rows * 9 - 1, page);
+        }
+        else {
+            gNextPage = setItemAtPage(nextPage, rows * 9 - 1, page);
+            gPrevPage = setItemAtPage(prevPage, rows * 9 - 2, page);
+        }
+        if (gNextPage != null) {
+            gNextPage.setOnClick(e -> {
+                setPage(page + 1);
+            });
+        }
+        if (gPrevPage != null) {
+            gPrevPage.setOnClick(e -> {
+                setPage(page - 1);
+            });
+        }
+        System.out.println("Updated Page: " + page);
+        if (page == getCurrentPage()) refreshWindow();
+    }
+
     void checkPageBounds(int page) {
         if (page < 1 || page > pages.size()) {
             throw new PageOutOfBoundsException(page, pages.size());
@@ -478,6 +566,18 @@ abstract class DefaultWindow implements Window {
             return;
         }
         item.executeOnClick(e);
+    }
+
+    void generateDefaultPlaceholders() {
+        nextPage = new ItemStack(Material.PAPER);
+        ItemMeta im = nextPage.getItemMeta();
+        im.displayName(Component.text(Util.color("&aNext Page")));
+        nextPage.setItemMeta(im);
+
+        prevPage = new ItemStack(Material.PAPER);
+        im = prevPage.getItemMeta();
+        im.displayName(Component.text(Util.color("&aPrevious Page")));
+        prevPage.setItemMeta(im);
     }
 
 }

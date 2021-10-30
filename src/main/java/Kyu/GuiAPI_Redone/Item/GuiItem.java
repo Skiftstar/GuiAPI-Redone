@@ -13,11 +13,20 @@ public class GuiItem {
     private Window parentWindow;
     private int slot;
     private Consumer<InventoryClickEvent> function = null;
+    private GItemType type;
 
     public GuiItem(ItemStack item, int slot, Window parentWindow) {
         this.item = item;
         this.parentWindow = parentWindow;
         this.slot = slot;
+        type = GItemType.DEFAULT;
+    }
+
+    public GuiItem(ItemStack item, int slot, GItemType type, Window parentWindow) {
+        this.item = item;
+        this.parentWindow = parentWindow;
+        this.slot = slot;
+        this.type = type;
     }
 
     public ItemStack getItemStack() {
@@ -41,6 +50,14 @@ public class GuiItem {
             return;
         }
         function.accept(e);
+    }
+
+    public GItemType getType() {
+        return type;
+    }
+
+    public enum GItemType {
+        PLACEHOLDER, DEFAULT;
     }
 
 }
