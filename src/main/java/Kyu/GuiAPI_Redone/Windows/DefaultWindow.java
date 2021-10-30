@@ -23,15 +23,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract class DefaultWindow implements Window, Listener {
+abstract class DefaultWindow implements Window {
 
-    private String title;
-    private Map<Integer, GuiItem[]> pages = new HashMap<>();
-    private int rows;
-    private boolean isMultiPage = false, preventItemGrab = true;
-    private int currPage;
     private GUI gui;
     private Inventory inv;
+
+    private String title;
+    private int rows;
+    private Map<Integer, GuiItem[]> pages = new HashMap<>();
+    private int currPage;
+    private boolean isMultiPage = false, preventItemGrab = true, preventItemPlace = true;
+
 
     protected DefaultWindow(@Nullable String title, int rows, GUI gui, JavaPlugin plugin) {
         this.title = title;
@@ -47,8 +49,6 @@ abstract class DefaultWindow implements Window, Listener {
         this.rows = rows;
         pages.put(1, new GuiItem[rows * 9]);
         currPage = 1;
-
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     /*
@@ -285,6 +285,14 @@ abstract class DefaultWindow implements Window, Listener {
 
     /**
      *
+     * @return Map<PageNumber, Array of GuiItems> of all Pages
+     */
+    public Map<Integer, GuiItem[]> getPages() {
+        return pages;
+    }
+
+    /**
+     *
      * @return Whether the inventory is allowed to have multiple pages
      */
     public boolean isMultiPage() {
@@ -326,6 +334,24 @@ abstract class DefaultWindow implements Window, Listener {
      */
     public boolean isPreventItemGrab() {
         return preventItemGrab;
+    }
+
+    /**
+     * Sets whether Placing Items in the inventory should be prevented
+     * Note: Placed items will <b>not</b> be added to the items list so far.
+     * @param preventItemPlace
+     */
+    public void setPreventItemPlace(boolean preventItemPlace) {
+        this.preventItemPlace = preventItemPlace;
+    }
+
+    /**
+     *
+     * @return Whether Placing Items in the inventory is prevented
+     * Note: Placed items will <b>not</b> be added to the items list so far.
+     */
+    public boolean isPreventItemPlace() {
+        return preventItemPlace;
     }
 
     /**
@@ -372,54 +398,61 @@ abstract class DefaultWindow implements Window, Listener {
     /*
     =============================================================================
 
-                                Private Methods
+                           Package Private Methods
 
     =============================================================================
      */
 
-    private void checkPageBounds(int page) {
+    void checkPageBounds(int page) {
         if (page < 1 || page > pages.size()) {
             throw new PageOutOfBoundsException(page, pages.size());
         }
     }
 
-    private void checkMultiPage() {
+    void checkMultiPage() {
         if (!isMultiPage) {
             throw new NoMultiPageOnException();
         }
     }
 
-    private void checkSlotBounds(int slot) {
+    void checkSlotBounds(int slot) {
         if (slot < 0 || slot > rows * 9 - 1) {
             throw new SlotOutOfBoundsException(slot, rows * 9 -1);
         }
     }
 
-        /*
-    =============================================================================
+    boolean isInvMove(InventoryClickEvent e) {
+        switch (e.getAction()) {
+            case MOVE_TO_OTHER_INVENTORY:
+            case PLACE_ALL:
+            case PLACE_ONE:
+            case PLACE_SOME:
+            case HOTBAR_SWAP:
+                return true;
+            default:
+                return false;
+        }
+    }
 
-                                Event Handler
-
-    =============================================================================
-     */
-
-    @EventHandler
-    private void onInvClick(InventoryClickEvent e) {
-        System.out.println("Called");
-        if (e.getClickedInventory() == null || !e.getClickedInventory().equals(inv)) {
+    void handleInvClick(InventoryClickEvent e) {
+        if (e.getClickedInventory() == null || !e.getClickedInventory().equals(getInv())) {
             return;
         }
         if (!e.getWhoClicked().equals(getHolder())) {
             return;
         }
-        if (e.getCurrentItem().getType().equals(Material.AIR)) {
+        System.out.println(e.getAction());
+        if (isPreventItemPlace() && isInvMove(e)) {
+            e.setCancelled(true);
+        }
+        if (e.getCurrentItem() == null || e.getCurrentItem().getType().equals(Material.AIR)) {
             return;
         }
-        if (preventItemGrab) {
+        if (isPreventItemGrab()) {
             e.setCancelled(true);
         }
         int slot = e.getSlot();
-        GuiItem item = pages.get(currPage)[slot];
+        GuiItem item = getPages().get(getCurrentPage())[slot];
         if (item == null) {
             return;
         }

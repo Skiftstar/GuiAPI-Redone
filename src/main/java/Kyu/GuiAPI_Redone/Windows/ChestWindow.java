@@ -1,8 +1,13 @@
 package Kyu.GuiAPI_Redone.Windows;
 
 import Kyu.GuiAPI_Redone.GUI;
+import Kyu.GuiAPI_Redone.Item.GuiItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChestWindow extends DefaultWindow{
+public class ChestWindow extends DefaultWindow implements Listener {
 
     /**
      * Creates a new Default (Chest) Window
@@ -21,5 +26,20 @@ public class ChestWindow extends DefaultWindow{
      */
     public ChestWindow(@Nullable String title, int rows, GUI gui, JavaPlugin plugin) {
         super(title, rows, gui, plugin);
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+
+    /*
+    =============================================================================
+
+                                Event Handler
+
+    =============================================================================
+     */
+
+    @EventHandler
+    private void onInvClick(InventoryClickEvent e) {
+        handleInvClick(e);
     }
 }
