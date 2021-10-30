@@ -228,6 +228,27 @@ abstract class DefaultWindow implements Window {
      */
 
     /**
+     * Adds a page
+     * Requires multiPage to be true, throws Exception otherwise
+     */
+    public void addPage() {
+        checkMultiPage();
+        pages.put(pages.size() + 1, new GuiItem[rows * 9]);
+    }
+
+    /**
+     * Removes a page
+     * Requires multiPage to be true, throws Exception otherwise
+     * Higher Page Numbers will be moved down to fill empty spot
+     * @param page Page to be removed. Throws Exception if out of bounds
+     */
+    public void removePage(int page) {
+        checkMultiPage();
+        checkPageBounds(page);
+        pages.remove(page);
+    }
+
+    /**
      * Changes Page to specified page
      * Requires multiPage to be true, will throw Exception otherwise
      * @param page Page to change to. Throws Exception if out of bounds
@@ -240,7 +261,7 @@ abstract class DefaultWindow implements Window {
     }
 
     /**
-     * Clears specified page
+     * Clears specified page, does <b>not remove the page</b>
      * @param page Page to be cleared. Requires multiPage to be true if greater than 1. Throws Exception if out of bounds
      */
     public void clearPage(int page) {
@@ -256,7 +277,7 @@ abstract class DefaultWindow implements Window {
     }
 
     /**
-     * Clears all Pages and removes them (except first)
+     * Clears all Pages <b>and removes them (except first)</b>
      */
     public void clearAllPages() {
         pages.clear();
@@ -285,7 +306,7 @@ abstract class DefaultWindow implements Window {
 
     /**
      *
-     * @return Map<PageNumber, Array of GuiItems> of all Pages
+     * @return Map(PageNumber, Array of GuiItems) of all Pages
      */
     public Map<Integer, GuiItem[]> getPages() {
         return pages;

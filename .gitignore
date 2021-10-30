@@ -5,6 +5,9 @@
 *.ipr
 *.iws
 
+# JavaDoc
+javaDoc/
+
 # IntelliJ
 out/
 
