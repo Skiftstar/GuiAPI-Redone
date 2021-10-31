@@ -143,5 +143,8 @@ public class GuiItem {
             ((DefaultWindow) parentWindow).removeItemFromPage(getSlot(), getPage());
         }
         ((DefaultWindow) parentWindow).getPages().get(page)[slot] = this;
+        if (page == ((DefaultWindow) parentWindow).getCurrentPage()) {
+            parentWindow.refreshWindow();
+        }
     }
 }
