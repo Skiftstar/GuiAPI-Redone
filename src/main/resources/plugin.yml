@@ -7,3 +7,5 @@ api-version: 1.17
 commands:
   kTest:
     description: a
+  mTest:
+    description: b

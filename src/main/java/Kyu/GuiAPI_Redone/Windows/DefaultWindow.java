@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 abstract class DefaultWindow implements Window {
 
     private GUI gui;
