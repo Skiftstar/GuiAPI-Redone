@@ -6,16 +6,12 @@ import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Util.Util;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.chat.ChatMessage;
-import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.world.entity.player.PlayerInventory;
 import net.minecraft.world.inventory.ContainerAnvil;
 import net.minecraft.world.inventory.Containers;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.level.IMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,7 +22,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class AnvilWindow implements Window, Listener{
 
@@ -34,11 +31,11 @@ public class AnvilWindow implements Window, Listener{
     GuiItem[] items = new GuiItem[3];
     Inventory inv;
     String message;
-    String title;
+    String Anviltitle;
 
     public AnvilWindow(String message, Player player, String title, JavaPlugin plugin) {
         gui = new GUI(player, plugin);
-        this.title = title;
+        this.Anviltitle = title;
         inv = Bukkit.createInventory(getHolder(), InventoryType.ANVIL, Component.text(Util.color(title)));
         this.message = message;
     }
@@ -51,7 +48,10 @@ public class AnvilWindow implements Window, Listener{
         ContainerAnvil containerAnvil = new ContainerAnvil(containerId, inventory);
 
         Util.getNMSPlayer(gui.getHolder()).b.sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.h, new ChatMessage("test")));
-        containerAnvil.setItem(0, CraftItemStack.asNMSCopy(items[1].getItemStack()));
+        //containerAnvil.setItem(0, CraftItemStack.asNMSCopy(items[1].getItemStack()));
+
+        //containerAnvil.b(1, CraftItemStack.asNMSCopy(items[0].getItemStack()));
+        containerAnvil.a(0, CraftItemStack.asNMSCopy(items[0].getItemStack()));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class AnvilWindow implements Window, Listener{
 
     @Override
     public String getTitle() {
-        return title;
+        return null;
     }
 
     @Override
