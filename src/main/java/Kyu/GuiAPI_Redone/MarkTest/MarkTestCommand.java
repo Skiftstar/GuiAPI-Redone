@@ -8,6 +8,7 @@ import Kyu.GuiAPI_Redone.Windows.AnvilWindow;
 import Kyu.GuiAPI_Redone.Windows.ChestWindow;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -41,7 +42,7 @@ public class MarkTestCommand implements CommandExecutor {
 
 
         //item.setLore("Lorem Ipsum/n is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.");
-        item.setLore(30, "Mauris varius hendrerit odio, at dignissim nulla molestie a.\n\nCurabitur ut enim congue, vestibulum enim in, fringilla nisi. Mauris lectus urna, sollicitudin finibus facilisis ut, gravida quis tellus. Nunc tincidunt elementum auctor. Curabitur aliquam tortor quam, in lacinia tellus ultricies sed. Donec interdum metus ut ligula porta iaculis. Nulla vehicula ultricies massa, eget consectetur enim mattis sit amet.");
+        item.setLoreRedo(40, "&c&lContrary to popular belief, Lorem Ipsum is &a&onot simply random text. &c&l&n&mIt has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.");
 
         item.setOnClick(e -> {
             window.addPage();
@@ -55,6 +56,8 @@ public class MarkTestCommand implements CommandExecutor {
         String patternStr = "\n ";
         String[] paras = Pattern.compile(patternStr, Pattern.MULTILINE).split(s);
         ArrayList<String> lores = new ArrayList<>();
+
+        String lastColorCharacter;
 
         for(String string : paras){
             int length = string.length();
@@ -88,6 +91,8 @@ public class MarkTestCommand implements CommandExecutor {
                 }
 
                 lores.add(Util.color(subS));
+
+                String lastColors = ChatColor.getLastColors(subS);
             }
             lores.add(Util.color(string.substring(temp)));
         }

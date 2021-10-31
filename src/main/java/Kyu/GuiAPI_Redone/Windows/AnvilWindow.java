@@ -2,6 +2,7 @@ package Kyu.GuiAPI_Redone.Windows;
 
 import Kyu.GuiAPI_Redone.Errors.SlotOutOfBoundsException;
 import Kyu.GuiAPI_Redone.GUI;
+import Kyu.GuiAPI_Redone.Item.FakeAnvil;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Util.Util;
 import net.kyori.adventure.text.Component;
@@ -32,26 +33,20 @@ public class AnvilWindow implements Window, Listener{
     Inventory inv;
     String message;
     String Anviltitle;
+    FakeAnvil anvil;
 
     public AnvilWindow(String message, Player player, String title, JavaPlugin plugin) {
         gui = new GUI(player, plugin);
         this.Anviltitle = title;
         inv = Bukkit.createInventory(getHolder(), InventoryType.ANVIL, Component.text(Util.color(title)));
         this.message = message;
+        //this.anvil = new FakeAnvil(player, ,title);
     }
 
     @Override
     public void open() {
         refreshWindow();
-        PlayerInventory inventory = new PlayerInventory(Util.getNMSPlayer(gui.getHolder()));
-        int containerId = Util.getNMSPlayer(gui.getHolder()).nextContainerCounter();
-        ContainerAnvil containerAnvil = new ContainerAnvil(containerId, inventory);
 
-        Util.getNMSPlayer(gui.getHolder()).b.sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.h, new ChatMessage("test")));
-        //containerAnvil.setItem(0, CraftItemStack.asNMSCopy(items[1].getItemStack()));
-
-        //containerAnvil.b(1, CraftItemStack.asNMSCopy(items[0].getItemStack()));
-        containerAnvil.a(0, CraftItemStack.asNMSCopy(items[0].getItemStack()));
     }
 
     @Override
