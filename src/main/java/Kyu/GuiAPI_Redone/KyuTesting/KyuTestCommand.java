@@ -4,13 +4,15 @@ import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Main;
 import Kyu.GuiAPI_Redone.Windows.ChestWindow;
-import net.kyori.adventure.text.Component;
+import Kyu.GuiAPI_Redone.Windows.TaskbarStyles;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class KyuTestCommand implements CommandExecutor {
 
@@ -27,6 +29,9 @@ public class KyuTestCommand implements CommandExecutor {
         GUI gui = new GUI(p, plugin);
         ChestWindow window = gui.createChestWindow("test", 6);
         window.setMultiPage(true);
+        window.setTaskBarEnabled(false);
+        window.setTaskbarStyle(TaskbarStyles.MIDDLE);
+        window.setPagePlaceholders(Material.PAPER, "next", "back");
         GuiItem item = window.setItem(Material.FEATHER, "&cAdd Page", 15);
         item.setOnClick(e -> {
             window.addPage();
@@ -38,6 +43,16 @@ public class KyuTestCommand implements CommandExecutor {
         GuiItem item3 = window.setItem(Material.REDSTONE_TORCH, "&aremove last Page", 13);
         item3.setOnClick(e -> {
             window.removePage(window.getPages().size());
+        });
+        GuiItem item4 = window.setItem(Material.WRITABLE_BOOK, "&aChange placeholders", 12);
+        item4.setOnClick(e -> {
+            window.setTaskbarPlaceholder(Material.GRAY_STAINED_GLASS_PANE, " ");
+        });
+        GuiItem item5 = window.setItem(Material.END_ROD, "&aAdd Wool", 11);
+        AtomicInteger i = new AtomicInteger();
+        item5.setOnClick(e -> {
+            window.addItem(Material.BLUE_WOOL, "&b" + i);
+            i.getAndIncrement();
         });
         window.open();
         return true;

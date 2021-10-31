@@ -1,6 +1,7 @@
 package Kyu.GuiAPI_Redone.Item;
 
 import Kyu.GuiAPI_Redone.Util.Util;
+import Kyu.GuiAPI_Redone.Windows.DefaultWindow;
 import Kyu.GuiAPI_Redone.Windows.Window;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -44,10 +45,6 @@ public class GuiItem {
         return slot;
     }
 
-    public Window getParentWindow() {
-        return parentWindow;
-    }
-
     /**
      * Not intended for public use!
      * @param slot
@@ -55,6 +52,11 @@ public class GuiItem {
     public void setSlot(int slot) {
         this.slot = slot;
     }
+
+    public Window getParentWindow() {
+        return parentWindow;
+    }
+
 
     public void setOnClick(Consumer<InventoryClickEvent> consumer) {
         function = consumer;
@@ -117,5 +119,13 @@ public class GuiItem {
             lores.add(Util.color(s));
         }
         lores.add(Util.color(lore.substring(temp)));
+    }
+
+    public void relocatePage(int slot, int page) {
+        GuiItem itemOnOldSlot = ((DefaultWindow) parentWindow).getGuiItemFromPage(getSlot(), getPage());
+        if (itemOnOldSlot != null && itemOnOldSlot.equals(this)) {
+            ((DefaultWindow) parentWindow).removeItemFromPage(getSlot(), getPage());
+        }
+        ((DefaultWindow) parentWindow).getPages().get(page)[slot] = this;
     }
 }

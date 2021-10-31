@@ -1,9 +1,6 @@
 package Kyu.GuiAPI_Redone.Windows;
 
-import Kyu.GuiAPI_Redone.Errors.NoMultiPageOnException;
-import Kyu.GuiAPI_Redone.Errors.PageOutOfBoundsException;
-import Kyu.GuiAPI_Redone.Errors.RowsOutOfBoundsException;
-import Kyu.GuiAPI_Redone.Errors.SlotOutOfBoundsException;
+import Kyu.GuiAPI_Redone.Errors.*;
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Util.Util;
@@ -11,8 +8,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -20,10 +15,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-abstract class DefaultWindow implements Window {
+import java.util.*;
+
+public abstract class DefaultWindow implements Window {
 
     private GUI gui;
     private Inventory inv;
@@ -35,6 +31,11 @@ abstract class DefaultWindow implements Window {
     private boolean isMultiPage = false, preventItemGrab = true, preventItemPlace = true, taskBarEnabled = false;
 
     private ItemStack nextPage, prevPage;
+    private String[] pagePlaceholderNames = new String[]{"&aPrevious Page", "&aNext Page"};
+    private ItemStack taskBarFiller;
+    private TaskbarStyles taskbarStyle = TaskbarStyles.RIGHT;
+
+    private List<GuiItem> relocatedItems = new ArrayList<>();
 
     protected DefaultWindow(@Nullable String title, int rows, GUI gui, JavaPlugin plugin) {
         generateDefaultPlaceholders();
@@ -93,7 +94,9 @@ abstract class DefaultWindow implements Window {
      */
     public GuiItem setItem(ItemStack item, int slot) {
         checkSlotBounds(slot);
+        doPlaceholderCheck(slot, getCurrentPage());
         GuiItem gItem = new GuiItem(item, slot, this);
+        gItem.setPage(getCurrentPage());
         pages.get(currPage)[slot] = gItem;
         inv.setItem(slot, item);
         return gItem;
@@ -107,17 +110,52 @@ abstract class DefaultWindow implements Window {
      * @return Added Item as GuiItem
      */
     public GuiItem setItem(Material itemType, @Nullable String name, int slot) {
-        checkSlotBounds(slot);
         ItemStack is = new ItemStack(itemType);
         if (name != null) {
             ItemMeta im = is.getItemMeta();
             im.displayName(Component.text(Util.color(name)));
             is.setItemMeta(im);
         }
-        GuiItem gItem = new GuiItem(is, slot, this);
-        pages.get(currPage)[slot] = gItem;
-        inv.setItem(slot, is);
-        return gItem;
+        return setItem(is, slot);
+    }
+
+    /**
+     * Adds item to the next free slot
+     * Creates new Page of no other slot is free
+     * @param item Item to add
+     * @return Added Item as GuiItem
+     */
+    public GuiItem addItem(ItemStack item) {
+        int slot = 0;
+        int page = 1;
+        while (getGuiItemFromPage(slot, page) != null) {
+            slot++;
+            if (slot > rows * 9 - 1) {
+                slot = 0;
+                page++;
+                if (page > pages.size()) {
+                    addPage();
+                }
+            }
+        }
+        return setItemAtPage(item, slot, page);
+    }
+
+    /**
+     * Adds item to the next free slot
+     * Creates new Page of no other slot is free
+     * @param mat Material of the Item
+     * @param name Nullable - Name of the Item
+     * @return Added Item as GuiItem
+     */
+    public GuiItem addItem(Material mat, @Nullable String name) {
+        ItemStack is = new ItemStack(mat);
+        if (name != null) {
+            ItemMeta im = is.getItemMeta();
+            im.displayName(Component.text(Util.color(name)));
+            is.setItemMeta(im);
+        }
+        return addItem(is);
     }
 
     /**
@@ -130,10 +168,15 @@ abstract class DefaultWindow implements Window {
      */
     public GuiItem setItemAtPage(ItemStack item, int slot, int page) {
         checkMultiPage();
+        if (page == getCurrentPage()) {
+            return setItem(item, slot);
+        }
+        doPlaceholderCheck(slot, page);
         checkPageBounds(page);
         checkSlotBounds(slot);
 
         GuiItem gItem = new GuiItem(item, slot, this);
+        gItem.setPage(page);
         pages.get(page)[slot] = gItem;
         return gItem;
     }
@@ -148,18 +191,13 @@ abstract class DefaultWindow implements Window {
      * @return Added Item as GuiItem
      */
     public GuiItem setItemAtPage(Material itemType, @Nullable String name, int slot, int page) {
-        checkMultiPage();
-        checkPageBounds(page);
-        checkSlotBounds(slot);
         ItemStack is = new ItemStack(itemType);
         if (name != null) {
             ItemMeta im = is.getItemMeta();
             im.displayName(Component.text(Util.color(name)));
             is.setItemMeta(im);
         }
-        GuiItem gItem = new GuiItem(is, slot, this);
-        pages.get(page)[slot] = gItem;
-        return gItem;
+        return setItemAtPage(is, slot, page);
     }
 
     /**
@@ -168,8 +206,26 @@ abstract class DefaultWindow implements Window {
      */
     public void removeItem(int slot) {
         checkSlotBounds(slot);
+        doPlaceholderCheck(slot, getCurrentPage());
         pages.get(currPage)[slot] = null;
         inv.setItem(slot, new ItemStack(Material.AIR));
+    }
+
+    /**
+     * Removes an item from a page
+     * @param slot slot to be cleared. Throws Exception if out of bounds
+     * @param page page of the slot. Throws Exception if out of bounds
+     */
+    public void removeItemFromPage(int slot, int page) {
+        checkMultiPage();
+        if (page == getCurrentPage()) {
+            removeItem(slot);
+            return;
+        }
+        doPlaceholderCheck(slot, page);
+        checkPageBounds(page);
+        checkSlotBounds(slot);
+        pages.get(page)[slot] = null;
     }
 
     /**
@@ -228,6 +284,104 @@ abstract class DefaultWindow implements Window {
 
     =============================================================================
      */
+
+    /**
+     * Sets the Item the Taskbar is made out of
+     * @param item
+     */
+    public void setTaskbarPlaceholder(ItemStack item) {
+        taskBarFiller = item;
+        for (int i : pages.keySet()) {
+            setPlaceholders(i);
+        }
+    }
+
+    /**
+     * Sets the Item the Taskbar is made out of
+     * @param mat Material of the item
+     * @param name Nullable - Name of the item
+     */
+    public void setTaskbarPlaceholder(Material mat, @Nullable String name) {
+        ItemStack is = new ItemStack(mat);
+        if (name != null) {
+            ItemMeta im = is.getItemMeta();
+            im.displayName(Component.text(Util.color(name)));
+            is.setItemMeta(im);
+        }
+        setTaskbarPlaceholder(is);
+    }
+
+    /**
+     * Sets the style of the taskbar
+     * @param taskbarStyle
+     */
+    public void setTaskbarStyle(TaskbarStyles taskbarStyle) {
+        this.taskbarStyle = taskbarStyle;
+    }
+
+    /**
+     * Sets whether the taskbar is enabled
+     * @param taskBarEnabled
+     */
+    public void setTaskBarEnabled(boolean taskBarEnabled) {
+        if (taskBarEnabled && rows == 1) {
+            throw new NotEnoughRowsException();
+        }
+        this.taskBarEnabled = taskBarEnabled;
+        if (taskBarEnabled) {
+            for (int i : pages.keySet()) {
+                setPlaceholders(i);
+            }
+        }
+    }
+
+    /**
+     *
+     * @return whether taskbar is enabled
+     */
+    public boolean isTaskBarEnabled() {
+        return taskBarEnabled;
+    }
+
+    /**
+     * Sets the Item for the page navigators
+     * @param item
+     * @param nextPageString Nullable - Name of the next page item
+     * @param prevPageString Nullable - Name of the prev page item
+     */
+    public void setPagePlaceholders(ItemStack item, @Nullable String nextPageString, @Nullable String prevPageString) {
+        nextPage = new ItemStack(item);
+        ItemMeta im = nextPage.getItemMeta();
+        if (nextPageString == null) {
+            im.displayName(Component.text(Util.color(pagePlaceholderNames[1])));
+        } else {
+            im.displayName(Component.text(Util.color(nextPageString)));
+        }
+        nextPage.setItemMeta(im);
+
+        prevPage = new ItemStack(item);
+        im = prevPage.getItemMeta();
+        if (prevPage == null) {
+            im.displayName(Component.text(Util.color(pagePlaceholderNames[0])));
+        } else {
+            im.displayName(Component.text(Util.color(prevPageString)));
+        }
+        prevPage.setItemMeta(im);
+
+        for (int i : pages.keySet()) {
+            setPlaceholders(i);
+        }
+    }
+
+    /**
+     * Sets the item for the page navigators
+     * @param mat Material of the item
+     * @param nextPageString Nullable - Name of the next page item
+     * @param prevPageString Nullable - Name of the prev page item
+     */
+    public void setPagePlaceholders(Material mat, @Nullable String nextPageString, @Nullable String prevPageString) {
+        setPagePlaceholders(new ItemStack(mat), nextPageString, prevPageString);
+    }
 
     /**
      * Adds a page
@@ -381,13 +535,11 @@ abstract class DefaultWindow implements Window {
      */
     public void refreshWindow() {
         GuiItem[] items = pages.get(currPage);
-        System.out.println(Arrays.toString(items));
         for (int i = 0; i < items.length; i++) {
             if (items[i] == null) {
                 inv.setItem(i, new ItemStack(Material.AIR));
                 continue;
             }
-            System.out.println(items[i].getItemStack().getType());
             inv.setItem(i, items[i].getItemStack());
         }
     }
@@ -474,6 +626,31 @@ abstract class DefaultWindow implements Window {
         return inv;
     }
 
+    /**
+     * Returns the next free slot and the page this slot is on
+     * @param allowCreateNewPage if true, creates a new Page if there's no free slot
+     * @return Key - Slot Value - Page | -1 for both if no free slot
+     */
+    public AbstractMap.SimpleEntry<Integer, Integer> getNextFreeSlot(boolean allowCreateNewPage) {
+        int slot = 0;
+        int page = 1;
+        while (getGuiItemFromPage(slot, page) != null) {
+            slot++;
+            if (slot > rows * 9 - 1) {
+                slot = 0;
+                page++;
+                if (page > pages.size()) {
+                    if (allowCreateNewPage) {
+                        addPage();
+                    } else {
+                        return new AbstractMap.SimpleEntry<>(-1, -1);
+                    }
+                }
+            }
+        }
+        return new AbstractMap.SimpleEntry<>(slot, page);
+    }
+
 
     /*
     =============================================================================
@@ -483,32 +660,70 @@ abstract class DefaultWindow implements Window {
     =============================================================================
      */
 
+    void removePlaceHolders(int page) {
+        for (int i = 1; i != 3; i++) {
+            GuiItem item = getGuiItemFromPage(rows * 9 - i, page);
+            if (item == null || !item.getType().equals(GuiItem.GItemType.PLACEHOLDER)) {
+                continue;
+            }
+            forceRemoveItem(rows * 9 - i, page);
+        }
+    }
+
     void setPlaceholders(int page) {
         GuiItem gNextPage = null, gPrevPage = null;
-        if (page == 1) {
-            if (pages.size() < 2) {
-                return;
+        removePlaceHolders(page);
+
+        TaskbarStyles style = null;
+
+        if (isTaskBarEnabled()) {
+            style = taskbarStyle;
+            for (int i = (rows - 1) * 9; i < rows * 9; i++) {
+                forceRemoveItem(i, page);
+                GuiItem placeholder = setItemAtPage(taskBarFiller, i, page);
+                placeholder.setType(GuiItem.GItemType.PLACEHOLDER);
             }
-            gNextPage = setItemAtPage(nextPage, rows * 9 - 1, page);
-        } else if (pages.get(page + 1) == null) {
-            gPrevPage = setItemAtPage(prevPage, rows * 9 - 1, page);
         }
-        else {
-            gNextPage = setItemAtPage(nextPage, rows * 9 - 1, page);
-            gPrevPage = setItemAtPage(prevPage, rows * 9 - 2, page);
+
+        if (style == null) {
+            int placeSlot = 8;
+            if (pages.get(page + 1) != null) {
+                gNextPage = replaceItemAtPage(nextPage, (rows - 1) * 9 + placeSlot, page);
+                placeSlot--;
+            }
+            if (page > 1) {
+                gPrevPage = replaceItemAtPage(prevPage, (rows - 1) * 9 + placeSlot, page);
+            }
+        } else {
+            if (pages.get(page + 1) != null) {
+                gNextPage = replaceItemAtPage(nextPage, (rows - 1) * 9 + style.next(), page);
+            }
+            if (page > 1) {
+                gPrevPage = replaceItemAtPage(prevPage, (rows - 1) * 9 + style.prev(), page);
+            }
         }
+
+
         if (gNextPage != null) {
+            gNextPage.setType(GuiItem.GItemType.PLACEHOLDER);
             gNextPage.setOnClick(e -> {
                 setPage(page + 1);
             });
         }
         if (gPrevPage != null) {
+            gPrevPage.setType(GuiItem.GItemType.PLACEHOLDER);
             gPrevPage.setOnClick(e -> {
                 setPage(page - 1);
             });
         }
         System.out.println("Updated Page: " + page);
         if (page == getCurrentPage()) refreshWindow();
+        List<GuiItem> move = new ArrayList<>(relocatedItems);
+        relocatedItems.clear();
+        for (GuiItem item : move) {
+            AbstractMap.SimpleEntry<Integer, Integer> freeSlot = getNextFreeSlot(true);
+            item.relocatePage(freeSlot.getKey(), freeSlot.getValue());
+        }
     }
 
     void checkPageBounds(int page) {
@@ -570,13 +785,40 @@ abstract class DefaultWindow implements Window {
     void generateDefaultPlaceholders() {
         nextPage = new ItemStack(Material.PAPER);
         ItemMeta im = nextPage.getItemMeta();
-        im.displayName(Component.text(Util.color("&aNext Page")));
+        im.displayName(Component.text(Util.color(pagePlaceholderNames[1])));
         nextPage.setItemMeta(im);
 
         prevPage = new ItemStack(Material.PAPER);
         im = prevPage.getItemMeta();
-        im.displayName(Component.text(Util.color("&aPrevious Page")));
+        im.displayName(Component.text(Util.color(pagePlaceholderNames[0])));
         prevPage.setItemMeta(im);
+
+        taskBarFiller = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
+        im = taskBarFiller.getItemMeta();
+        im.displayName(Component.text(" "));
+        taskBarFiller.setItemMeta(im);
+    }
+
+    void doPlaceholderCheck(int slot, int page) {
+        GuiItem item = getGuiItemFromPage(slot, page);
+        if (item == null) return;
+        if (item.getType().equals(GuiItem.GItemType.PLACEHOLDER)) {
+            throw new AttemptToChangePlaceholderException();
+        }
+    }
+
+    //Ignores checks
+    void forceRemoveItem(int slot, int page) {
+        GuiItem itemAtSlot = getGuiItemFromPage(slot, page);
+        if (itemAtSlot != null && itemAtSlot.getType().equals(GuiItem.GItemType.DEFAULT)) {
+            relocatedItems.add(itemAtSlot);
+        }
+        pages.get(page)[slot] = null;
+    }
+
+    GuiItem replaceItemAtPage(ItemStack item, int slot, int page) {
+        forceRemoveItem(slot, page);
+        return setItemAtPage(item, slot, page);
     }
 
 }
