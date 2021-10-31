@@ -39,6 +39,7 @@ public class MarkTestCommand implements CommandExecutor {
         window.setMultiPage(true);
         GuiItem item = window.setItem(Material.FEATHER, "&cAdd Page", 15);
 
+
         //item.setLore("Lorem Ipsum/n is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.");
         item.setLore(30, "Mauris varius hendrerit odio, at dignissim nulla molestie a.\n\nCurabitur ut enim congue, vestibulum enim in, fringilla nisi. Mauris lectus urna, sollicitudin finibus facilisis ut, gravida quis tellus. Nunc tincidunt elementum auctor. Curabitur aliquam tortor quam, in lacinia tellus ultricies sed. Donec interdum metus ut ligula porta iaculis. Nulla vehicula ultricies massa, eget consectetur enim mattis sit amet.");
 
