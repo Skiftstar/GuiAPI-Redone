@@ -29,7 +29,7 @@ public class KyuTestCommand implements CommandExecutor {
         GUI gui = new GUI(p, plugin);
         ChestWindow window = gui.createChestWindow("test", 6);
         window.setMultiPage(true);
-        window.setTaskBarEnabled(false);
+        window.setTaskBarEnabled(true);
         window.setTaskbarStyle(TaskbarStyles.MIDDLE);
         window.setPagePlaceholders(Material.PAPER, "next", "back");
         GuiItem item = window.setItem(Material.FEATHER, "&cAdd Page", 15);
@@ -44,15 +44,19 @@ public class KyuTestCommand implements CommandExecutor {
         item3.setOnClick(e -> {
             window.removePage(window.getPages().size());
         });
-        GuiItem item4 = window.setItem(Material.WRITABLE_BOOK, "&aChange placeholders", 12);
+        GuiItem item4 = window.setItem(Material.WRITABLE_BOOK, "&aSet Item at Page 12", 12);
         item4.setOnClick(e -> {
-            window.setTaskbarPlaceholder(Material.GRAY_STAINED_GLASS_PANE, " ");
+            window.setItemAtPage(Material.GRAY_STAINED_GLASS_PANE, " ", 20, 12, true);
         });
         GuiItem item5 = window.setItem(Material.END_ROD, "&aAdd Wool", 11);
         AtomicInteger i = new AtomicInteger();
         item5.setOnClick(e -> {
             window.addItem(Material.BLUE_WOOL, "&b" + i);
             i.getAndIncrement();
+        });
+        GuiItem item6 = window.setItem(Material.BARRIER, "&cRemove Empty Pages", 10);
+        item6.setOnClick(e -> {
+            window.removeEmptyPages();
         });
         window.open();
         return true;

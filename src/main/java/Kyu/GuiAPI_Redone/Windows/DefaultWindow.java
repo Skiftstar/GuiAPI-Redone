@@ -138,7 +138,7 @@ public abstract class DefaultWindow implements Window {
                 }
             }
         }
-        return setItemAtPage(item, slot, page);
+        return setItemAtPage(item, slot, page, false);
     }
 
     /**
@@ -163,18 +163,24 @@ public abstract class DefaultWindow implements Window {
      * Requires multiPage to be true, will throw Exception otherwise
      * @param item Item appearing
      * @param slot Slot the Item will be placed in. Throws Exception if out of bounds
-     * @param page Page the Item will be placed on. Throws Exception if out of bounds
+     * @param page Page the Item will be placed on. Throws Exception if out of bounds if forceCreatePage is false
+     * @param forceCreatePage Whether a new Page should be created when page is out of bounds
      * @return Added Item as GuiItem
      */
-    public GuiItem setItemAtPage(ItemStack item, int slot, int page) {
+    public GuiItem setItemAtPage(ItemStack item, int slot, int page, boolean forceCreatePage) {
         checkMultiPage();
         if (page == getCurrentPage()) {
             return setItem(item, slot);
         }
+        if (forceCreatePage && page > pages.size()) {
+            do {
+                addPage();
+            } while(page != pages.size());
+        } else {
+            checkPageBounds(page);
+        }
         doPlaceholderCheck(slot, page);
-        checkPageBounds(page);
         checkSlotBounds(slot);
-
         GuiItem gItem = new GuiItem(item, slot, this);
         gItem.setPage(page);
         pages.get(page)[slot] = gItem;
@@ -188,16 +194,17 @@ public abstract class DefaultWindow implements Window {
      * @param name Nullable - Name of the Item
      * @param slot Slot the Item will be placed in. Throws Exception if out of bounds
      * @param page Page the Item will be placed in. Throws Exception if out of bounds
+     * @param forceCreatePage Whether a new Page should be created when page is out of bounds
      * @return Added Item as GuiItem
      */
-    public GuiItem setItemAtPage(Material itemType, @Nullable String name, int slot, int page) {
+    public GuiItem setItemAtPage(Material itemType, @Nullable String name, int slot, int page, boolean forceCreatePage) {
         ItemStack is = new ItemStack(itemType);
         if (name != null) {
             ItemMeta im = is.getItemMeta();
             im.displayName(Component.text(Util.color(name)));
             is.setItemMeta(im);
         }
-        return setItemAtPage(is, slot, page);
+        return setItemAtPage(is, slot, page, forceCreatePage);
     }
 
     /**
@@ -438,6 +445,9 @@ public abstract class DefaultWindow implements Window {
             if (pages.get(page) == null && pages.get(page + 1) != null) {
                 while (pages.get(page + 1) != null) {
                     pages.put(page, pages.get(page +1));
+                    for (GuiItem item : pages.get(page)) {
+                        if (item != null) item.setPage(page);
+                    }
                     pages.remove(page + 1);
                     page++;
                 }
@@ -485,6 +495,33 @@ public abstract class DefaultWindow implements Window {
         pages.put(1, new GuiItem[rows * 9]);
         currPage = 1;
         refreshWindow();
+    }
+
+    /**
+     * Removes all empty pages. Pages with only Placeholders on them count as empty
+     */
+    public void removeEmptyPages() {
+        List<Integer> pagesToRemove = new ArrayList<>();
+        for (int page : pages.keySet()) {
+            if (isPageEmpty(page)) pagesToRemove.add(page);
+        }
+        for (int i = 0; i < pagesToRemove.size(); i++) {
+            removePage(pagesToRemove.get(i) - i);
+        }
+    }
+
+    /**
+     *
+     * @param page The page to check. Throws Exception if out of bounds
+     * @return Whether the page is empty. Ignores Placeholders
+     */
+    public boolean isPageEmpty(int page) {
+        checkPageBounds(page);
+        for (GuiItem item : pages.get(page)) {
+            if (item == null) continue;
+            if (item.getType().equals(GuiItem.GItemType.DEFAULT)) return false;
+        }
+        return true;
     }
 
     /**
@@ -680,7 +717,7 @@ public abstract class DefaultWindow implements Window {
             style = taskbarStyle;
             for (int i = (rows - 1) * 9; i < rows * 9; i++) {
                 forceRemoveItem(i, page);
-                GuiItem placeholder = setItemAtPage(taskBarFiller, i, page);
+                GuiItem placeholder = setItemAtPage(taskBarFiller, i, page, false);
                 placeholder.setType(GuiItem.GItemType.PLACEHOLDER);
             }
         }
@@ -818,7 +855,7 @@ public abstract class DefaultWindow implements Window {
 
     GuiItem replaceItemAtPage(ItemStack item, int slot, int page) {
         forceRemoveItem(slot, page);
-        return setItemAtPage(item, slot, page);
+        return setItemAtPage(item, slot, page, false);
     }
 
 }
