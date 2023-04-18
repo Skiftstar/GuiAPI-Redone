@@ -32,7 +32,9 @@ public class GUI {
      * @param window {@link Window} to open
      */
     public void openWindow(Window window) {
-        currentWindow.setIgnoreCloseEvent(true);
+        if (currentWindow != null) {
+            currentWindow.setIgnoreCloseEvent(true);
+        }
         this.currentWindow = window;
         holder.openInventory(window.getInventory());
     }
