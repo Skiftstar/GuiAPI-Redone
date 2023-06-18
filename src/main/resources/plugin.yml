@@ -1,6 +1,6 @@
 name: GuiAPI_Redone
 version: '${project.version}'
-main: Kyu.GuiAPI_Redone.Main
+main: Kyu.GuiAPI_Redone.Testing.Main
 api-version: 1.19
 
 

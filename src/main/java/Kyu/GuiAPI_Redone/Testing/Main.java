@@ -1,16 +1,15 @@
-package Kyu.GuiAPI_Redone;
+package Kyu.GuiAPI_Redone.Testing;
 
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import Kyu.GuiAPI_Redone.Item.GuiItem;
-import Kyu.GuiAPI_Redone.Window.Window;
-import net.kyori.adventure.text.Component;
+import Kyu.GuiAPI_Redone.GUI;
 
+/*
+ * FOR TESTING ONLY
+ */
 public final class Main extends JavaPlugin {
 
     @Override
@@ -28,14 +27,8 @@ public final class Main extends JavaPlugin {
         Player p = (Player) sender;
         GUI gui = new GUI(p, this);
 
-        Window window = new Window(gui, 6, "&bTitle");
-
-        GuiItem item = new GuiItem(new ItemStack(Material.GLASS_PANE)).withListener(e -> {
-            p.sendMessage(Component.text("abc"));
-        });
-        window.addItem(item);
-
-        gui.openWindow(window);
+        gui.openWindow(new TestWindow(gui, p));
+        
         return true;
     }
 }

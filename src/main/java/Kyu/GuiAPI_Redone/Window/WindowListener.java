@@ -5,10 +5,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 
+
 public class WindowListener implements Listener {
+
+    public WindowListener(JavaPlugin plugin) {
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
 
     @EventHandler
     private void onInventoryClose(InventoryCloseEvent e) {
