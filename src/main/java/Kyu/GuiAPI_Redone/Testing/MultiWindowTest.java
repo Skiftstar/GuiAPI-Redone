@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
-import Kyu.GuiAPI_Redone.Item.Toolbar;
+import Kyu.GuiAPI_Redone.Item.PaginationBar;
 import Kyu.GuiAPI_Redone.Window.MultiWindow;
 import Kyu.GuiAPI_Redone.Window.Windows.ChestWindow;
 
@@ -14,8 +14,8 @@ public class MultiWindowTest extends MultiWindow {
     private Player player;
 
     public MultiWindowTest(GUI gui, Player player) {
-        super(gui, new Toolbar());
-        getToolbar().setToolbarItems(Material.WHITE_STAINED_GLASS_PANE, Material.OAK_SIGN);
+        super(gui, new PaginationBar());
+        getPaginationBar().setToolbarItems(Material.WHITE_STAINED_GLASS_PANE, Material.OAK_SIGN);
         this.player = player;
         build();
     }

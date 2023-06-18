@@ -8,7 +8,7 @@ import Kyu.GuiAPI_Redone.Exceptions.MultiWindowEmptyException;
 import Kyu.GuiAPI_Redone.Exceptions.NoPaginationPossibleException;
 import Kyu.GuiAPI_Redone.Exceptions.NoSuchPageException;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
-import Kyu.GuiAPI_Redone.Item.Toolbar;
+import Kyu.GuiAPI_Redone.Item.PaginationBar;
 import Kyu.GuiAPI_Redone.Window.Windows.ChestWindow;
 
 public abstract class MultiWindow {
@@ -16,16 +16,16 @@ public abstract class MultiWindow {
     private List<ChestWindow> windows = new ArrayList<>();
     private int currIndex = 0;
     private GUI gui;
-    private Toolbar toolbar;
+    private PaginationBar paginationBar;
 
     /**
      * Creates a new MultiWindow
      * @param gui The {@link GUI} the MultiWindow is connected to
-     * @param toolbar The {@link Toolbar} to use
+     * @param paginationBar The {@link PaginationBar} to use
      */
-    public MultiWindow(GUI gui, Toolbar toolbar) {
+    public MultiWindow(GUI gui, PaginationBar paginationBar) {
         this.gui = gui;
-        this.toolbar = toolbar;
+        this.paginationBar = paginationBar;
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class MultiWindow {
         }
 
         currIndex = index;
-        refreshToolbar();
+        refreshPaginationBar();
         gui.openWindow(windows.get(index));
     }
 
@@ -92,7 +92,7 @@ public abstract class MultiWindow {
             windows.add(window);
             
         }
-        refreshToolbar();
+        refreshPaginationBar();
         return this;
     }
 
@@ -131,10 +131,10 @@ public abstract class MultiWindow {
     }
 
     /**
-     * @return The Toolbar for the {@link Window}s
+     * @return The {@link PaginationBar} for the {@link Window}s
      */
-    public Toolbar getToolbar() {
-        return toolbar;
+    public PaginationBar getPaginationBar() {
+        return paginationBar;
     }
 
     /**
@@ -159,13 +159,13 @@ public abstract class MultiWindow {
         return false;
     }
 
-    private void refreshToolbar() {
+    private void refreshPaginationBar() {
         ChestWindow window = windows.get(currIndex);
-        GuiItem[] toolbarItems = toolbar.buildToolbar(this, currIndex, windows.size(), getNextWindow(), getPreviousWindow(), gui);
+        GuiItem[] paginationItems = paginationBar.buildPaginationBar(this, currIndex, windows.size(), getNextWindow(), getPreviousWindow(), gui);
 
         int firstSlotOfLastRow = (window.getRows() - 1) * 9;
-        for (int itemIndex = 0; itemIndex < toolbarItems.length; itemIndex++) {
-            window.setItem(toolbarItems[itemIndex], firstSlotOfLastRow + itemIndex);
+        for (int itemIndex = 0; itemIndex < paginationItems.length; itemIndex++) {
+            window.setItem(paginationItems[itemIndex], firstSlotOfLastRow + itemIndex);
         }
     }
 
@@ -176,7 +176,7 @@ public abstract class MultiWindow {
         } else {
             window = windows.get(--currIndex);
         }
-        refreshToolbar();
+        refreshPaginationBar();
         gui.openWindow(window);
     }
 
