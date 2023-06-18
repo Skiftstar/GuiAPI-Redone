@@ -10,7 +10,7 @@ import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Item.Toolbar;
 import Kyu.GuiAPI_Redone.Window.Windows.ChestWindow;
 
-public class MultiWindow {
+public abstract class MultiWindow {
     
     private List<ChestWindow> windows = new ArrayList<>();
     private int currIndex = 0;
@@ -114,6 +114,27 @@ public class MultiWindow {
      */
     public GUI getGui() {
         return gui;
+    }
+
+    /**
+     * @return The Toolbar for the {@link Window}s
+     */
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    /**
+     * @return The {@link Window}s in the MultiWindow 
+     */
+    public List<ChestWindow> getWindows() {
+        return windows;
+    }
+
+    /**
+     * @return The index of the currently opened {@link Window}
+     */
+    public int getCurrIndex() {
+        return currIndex;
     }
 
     private boolean closeIfNoWindows() {
