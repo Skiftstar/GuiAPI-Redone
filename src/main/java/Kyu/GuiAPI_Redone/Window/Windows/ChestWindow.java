@@ -45,7 +45,7 @@ public abstract class ChestWindow extends Window {
     }
 
     /**
-     * Same as {@link Window#addItem(GuiItem)} but accepts a Slot
+     * Same as {@link ChestWindow#addItem(GuiItem)} but accepts a Slot
      * <p>
      * If the slot is used, it will override the item
      * @param item The item to add
