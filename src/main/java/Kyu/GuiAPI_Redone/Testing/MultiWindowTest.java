@@ -5,9 +5,9 @@ import org.bukkit.entity.Player;
 
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
-import Kyu.GuiAPI_Redone.Item.PaginationBar;
-import Kyu.GuiAPI_Redone.Window.MultiWindow;
-import Kyu.GuiAPI_Redone.Window.Windows.ChestWindow;
+import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
+import Kyu.GuiAPI_Redone.Window.WindowImpl.MultiWindow.MultiWindow;
+import Kyu.GuiAPI_Redone.Window.WindowImpl.MultiWindow.PaginationBar;
 
 public class MultiWindowTest extends MultiWindow {
 

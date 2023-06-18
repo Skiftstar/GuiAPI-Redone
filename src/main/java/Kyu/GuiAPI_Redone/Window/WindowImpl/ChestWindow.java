@@ -1,4 +1,4 @@
-package Kyu.GuiAPI_Redone.Window.Windows;
+package Kyu.GuiAPI_Redone.Window.WindowImpl;
 
 import org.bukkit.Bukkit;
 

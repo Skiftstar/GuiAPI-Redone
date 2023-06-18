@@ -1,4 +1,4 @@
-package Kyu.GuiAPI_Redone.Window;
+package Kyu.GuiAPI_Redone.Window.WindowImpl.MultiWindow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,8 @@ import Kyu.GuiAPI_Redone.Exceptions.MultiWindowEmptyException;
 import Kyu.GuiAPI_Redone.Exceptions.NoPaginationPossibleException;
 import Kyu.GuiAPI_Redone.Exceptions.NoSuchPageException;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
-import Kyu.GuiAPI_Redone.Item.PaginationBar;
-import Kyu.GuiAPI_Redone.Window.Windows.ChestWindow;
+import Kyu.GuiAPI_Redone.Window.Window;
+import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
 
 public abstract class MultiWindow {
     

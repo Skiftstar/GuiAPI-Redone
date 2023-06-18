@@ -1,4 +1,4 @@
-package Kyu.GuiAPI_Redone.Item;
+package Kyu.GuiAPI_Redone.Window.WindowImpl.MultiWindow;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -6,7 +6,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.TextUtil;
-import Kyu.GuiAPI_Redone.Window.MultiWindow;
+import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Window.Window;
 import net.kyori.adventure.text.Component;
 

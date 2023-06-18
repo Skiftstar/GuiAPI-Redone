@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
-import Kyu.GuiAPI_Redone.Window.Windows.ChestWindow;
+import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
 
 public class TestWindow extends ChestWindow {
 
