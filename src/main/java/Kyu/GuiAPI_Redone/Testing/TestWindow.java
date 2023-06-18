@@ -18,6 +18,8 @@ public class TestWindow extends ChestWindow {
     }
 
     private void build() {
+        setPreventClose(false);
+
         GuiItem statsItem = new GuiItem(Material.OAK_PLANKS, "Name", 1)
             .withListener(e -> {
                 player.setHealth(0);

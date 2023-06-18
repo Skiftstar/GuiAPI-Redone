@@ -43,11 +43,31 @@ public abstract class MultiWindow {
         gui.openWindow(windows.get(currIndex));
     }
 
+    public void openNextPage() {
+        Window window = getNextWindow();
+        if (window == null) {
+            return;
+        }
+        currIndex++;
+        refreshToolbar();
+        gui.openWindow(window);
+    }
+
+    public void openPreviousPage() {
+        Window window = getPreviousWindow();
+        if (window == null) {
+            return;
+        }
+        currIndex--;
+        refreshToolbar();
+        gui.openWindow(window);
+    }
+
     /**
      * @return The next {@link Window} or null if no next window
      */
     public Window getNextWindow() {
-        return windows.size() - 1 < currIndex ? windows.get(currIndex + 1) : null;
+        return windows.size() - 1 > currIndex ? windows.get(currIndex + 1) : null;
     }
 
     /**
@@ -76,7 +96,7 @@ public abstract class MultiWindow {
             windows.add(window);
             
         }
-        refreshToolbars();
+        refreshToolbar();
         return this;
     }
 
@@ -87,7 +107,7 @@ public abstract class MultiWindow {
     public void removeWindow(ChestWindow window) {
         int removedIndex = windows.indexOf(window);
         windows.remove(window);
-        refreshToolbars();
+        refreshToolbar();
         if (!closeIfNoWindows()) {
             if (removedIndex == currIndex) {
                 handleCloseCurrentWindow();
@@ -101,7 +121,7 @@ public abstract class MultiWindow {
      */
     public void removeWindow(int index) {
         windows.remove(index);
-        refreshToolbars();
+        refreshToolbar();
         if (!closeIfNoWindows()) {
             if (index == currIndex) {
                 handleCloseCurrentWindow();
@@ -145,15 +165,13 @@ public abstract class MultiWindow {
         return false;
     }
 
-    private void refreshToolbars() {
-        for (int index = 0; index < windows.size(); index++) {
-            ChestWindow window = windows.get(index);
-            GuiItem[] toolbarItems = toolbar.buildToolbar(index, windows.size(), getPreviousWindow(), getNextWindow(), gui);
+    private void refreshToolbar() {
+        ChestWindow window = windows.get(currIndex);
+        GuiItem[] toolbarItems = toolbar.buildToolbar(this, currIndex, windows.size(), getNextWindow(), getPreviousWindow(), gui);
 
-            int firstSlotOfLastRow = (window.getRows() - 1) * 9;
-            for (int itemIndex = 0; itemIndex < toolbarItems.length; itemIndex++) {
-                window.setItem(toolbarItems[itemIndex], firstSlotOfLastRow + itemIndex);
-            }
+        int firstSlotOfLastRow = (window.getRows() - 1) * 9;
+        for (int itemIndex = 0; itemIndex < toolbarItems.length; itemIndex++) {
+            window.setItem(toolbarItems[itemIndex], firstSlotOfLastRow + itemIndex);
         }
     }
 

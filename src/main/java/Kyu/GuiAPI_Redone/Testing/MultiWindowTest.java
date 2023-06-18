@@ -35,6 +35,6 @@ public class MultiWindowTest extends MultiWindow {
         ChestWindow window = new TestWindow(getGui(), player);
         window.setItem(removePageItem, 1);
         window.setItem(addPageItem, 0);
-        addWindow(new TestWindow(getGui(), player));
+        addWindow(window);
     }   
 }

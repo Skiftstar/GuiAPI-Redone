@@ -5,7 +5,5 @@ api-version: 1.19
 
 
 commands:
-  kTest:
+  test:
     description: a
-  mTest:
-    description: b

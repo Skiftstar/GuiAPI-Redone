@@ -28,7 +28,7 @@ public abstract class ChestWindow extends Window {
         }
 
         this.rows = rows;
-        super.inv = Bukkit.createInventory(this, rows * 9, Component.text(TextUtil.color(title)));
+        setInventory(Bukkit.createInventory(this, rows * 9, Component.text(TextUtil.color(title))));
     }
 
         /**
@@ -57,8 +57,8 @@ public abstract class ChestWindow extends Window {
         if (slot < 0 || slot > maxSlot) {
             throw new SlotOutOfBoundsException(slot, maxSlot);
         }
-        items.put(slot, item);
-        inv.setItem(slot, item.getItemStack());
+        getItems().put(slot, item);
+        getInventory().setItem(slot, item.getItemStack());
     }
 
     /**

@@ -23,6 +23,7 @@ public class GUI {
         this.holder = holder;
         this.plugin = plugin;
         //TODO: Check if automatically removed from listeners when gui no longer used
+        //FIXME: Testing says, won't be removed
         this.listener = new WindowListener(plugin);
     }
 

@@ -6,6 +6,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.TextUtil;
+import Kyu.GuiAPI_Redone.Window.MultiWindow;
 import Kyu.GuiAPI_Redone.Window.Window;
 import net.kyori.adventure.text.Component;
 
@@ -39,7 +40,7 @@ public class Toolbar {
         return this;
     }
 
-    public GuiItem[] buildToolbar(int windowIndex, int maxPages, Window nextPage, Window previosPage, GUI gui) {
+    public GuiItem[] buildToolbar(MultiWindow multiWindow, int windowIndex, int maxPages, Window nextPage, Window previosPage, GUI gui) {
         GuiItem[] items = new GuiItem[9];
 
         ItemStack placeholderItem = new ItemStack(getPlaceholderItem());
@@ -50,23 +51,23 @@ public class Toolbar {
         ItemStack pageForwItem = new ItemStack(getPageItem());
         meta = pageForwItem.getItemMeta();
         meta.displayName(Component.text(TextUtil.color(getPageForwText()
-            .replace("%page", "" + (windowIndex - 1))
-            .replace("%max", "" + maxPages))));
-        pageForwItem.setItemMeta(meta);
-
-        ItemStack pageBackItem = new ItemStack(getPageItem());
-        meta = pageForwItem.getItemMeta();
-        meta.displayName(Component.text(TextUtil.color(getPageBackText()
             .replace("%page", "" + (windowIndex + 1))
             .replace("%max", "" + maxPages))));
         pageForwItem.setItemMeta(meta);
 
+        ItemStack pageBackItem = new ItemStack(getPageItem());
+        meta = pageBackItem.getItemMeta();
+        meta.displayName(Component.text(TextUtil.color(getPageBackText()
+            .replace("%page", "" + (windowIndex - 1))
+            .replace("%max", "" + maxPages))));
+        pageBackItem.setItemMeta(meta);
+
         GuiItem placeholder = new GuiItem(placeholderItem);
         GuiItem pageForw = new GuiItem(pageForwItem).withListener(e -> {
-            gui.openWindow(nextPage);
+            multiWindow.openNextPage();
         });
         GuiItem pageBack = new GuiItem(pageBackItem).withListener(e -> {
-            gui.openWindow(previosPage);
+            multiWindow.openPreviousPage();
         });
 
         for (int i = 0; i < 9; i++) {

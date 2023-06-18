@@ -14,12 +14,12 @@ import Kyu.GuiAPI_Redone.Item.GuiItem;
 
 public abstract class Window implements InventoryHolder {
     
-    protected GUI gui;
-    protected String title;
-    protected Inventory inv;
-    protected Map<Integer, GuiItem> items = new HashMap<>();
-    protected Consumer<InventoryCloseEvent> onClose;
-    protected boolean disableClickEvent = true, isIgnoreCloseEvent = false, preventClose = true;
+    private GUI gui;
+    private String title;
+    private Inventory inv;
+    private Map<Integer, GuiItem> items = new HashMap<>();
+    private Consumer<InventoryCloseEvent> onClose;
+    private boolean disableClickEvent = true, isIgnoreCloseEvent = false, preventClose = true;
 
     /**
      * Creates a new window to be used in a gui
@@ -151,6 +151,10 @@ public abstract class Window implements InventoryHolder {
      */
     public GUI getGui() {
         return gui;
+    }
+
+    protected void setInventory(Inventory inv) {
+        this.inv = inv;
     }
 
     protected int getNextFreeSlot() {
