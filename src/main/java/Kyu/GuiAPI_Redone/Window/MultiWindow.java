@@ -6,6 +6,7 @@ import java.util.List;
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Exceptions.MultiWindowEmptyException;
 import Kyu.GuiAPI_Redone.Exceptions.NoPaginationPossibleException;
+import Kyu.GuiAPI_Redone.Exceptions.NoSuchPageException;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Item.Toolbar;
 import Kyu.GuiAPI_Redone.Window.Windows.ChestWindow;
@@ -43,24 +44,19 @@ public abstract class MultiWindow {
         gui.openWindow(windows.get(currIndex));
     }
 
-    public void openNextPage() {
-        Window window = getNextWindow();
-        if (window == null) {
-            return;
+    /**
+     * Opens a specific Page
+     * @throws NoSuchPageException If the index is out of bounds
+     * @param index The index of the Page to open (starts at 0)
+     */
+    public void openPage(int index) {
+        if (index < 0 || index > windows.size() - 1) {
+            throw new NoSuchPageException();
         }
-        currIndex++;
-        refreshToolbar();
-        gui.openWindow(window);
-    }
 
-    public void openPreviousPage() {
-        Window window = getPreviousWindow();
-        if (window == null) {
-            return;
-        }
-        currIndex--;
+        currIndex = index;
         refreshToolbar();
-        gui.openWindow(window);
+        gui.openWindow(windows.get(index));
     }
 
     /**

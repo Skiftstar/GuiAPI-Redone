@@ -42,6 +42,7 @@ public class Toolbar {
 
     public GuiItem[] buildToolbar(MultiWindow multiWindow, int windowIndex, int maxPages, Window nextPage, Window previosPage, GUI gui) {
         GuiItem[] items = new GuiItem[9];
+        int pageNum = windowIndex + 1;
 
         ItemStack placeholderItem = new ItemStack(getPlaceholderItem());
         ItemMeta meta = placeholderItem.getItemMeta();
@@ -51,23 +52,23 @@ public class Toolbar {
         ItemStack pageForwItem = new ItemStack(getPageItem());
         meta = pageForwItem.getItemMeta();
         meta.displayName(Component.text(TextUtil.color(getPageForwText()
-            .replace("%page", "" + (windowIndex + 1))
+            .replace("%page", "" + (pageNum + 1))
             .replace("%max", "" + maxPages))));
         pageForwItem.setItemMeta(meta);
 
         ItemStack pageBackItem = new ItemStack(getPageItem());
         meta = pageBackItem.getItemMeta();
         meta.displayName(Component.text(TextUtil.color(getPageBackText()
-            .replace("%page", "" + (windowIndex - 1))
+            .replace("%page", "" + (pageNum - 1))
             .replace("%max", "" + maxPages))));
         pageBackItem.setItemMeta(meta);
 
         GuiItem placeholder = new GuiItem(placeholderItem);
         GuiItem pageForw = new GuiItem(pageForwItem).withListener(e -> {
-            multiWindow.openNextPage();
+            multiWindow.openPage(windowIndex + 1);
         });
         GuiItem pageBack = new GuiItem(pageBackItem).withListener(e -> {
-            multiWindow.openPreviousPage();
+            multiWindow.openPage(windowIndex - 1);
         });
 
         for (int i = 0; i < 9; i++) {
