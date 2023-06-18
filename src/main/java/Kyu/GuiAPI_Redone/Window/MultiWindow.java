@@ -103,7 +103,6 @@ public abstract class MultiWindow {
     public void removeWindow(ChestWindow window) {
         int removedIndex = windows.indexOf(window);
         windows.remove(window);
-        refreshToolbar();
         if (!closeIfNoWindows()) {
             if (removedIndex == currIndex) {
                 handleCloseCurrentWindow();
@@ -117,7 +116,6 @@ public abstract class MultiWindow {
      */
     public void removeWindow(int index) {
         windows.remove(index);
-        refreshToolbar();
         if (!closeIfNoWindows()) {
             if (index == currIndex) {
                 handleCloseCurrentWindow();
@@ -178,6 +176,7 @@ public abstract class MultiWindow {
         } else {
             window = windows.get(--currIndex);
         }
+        refreshToolbar();
         gui.openWindow(window);
     }
 
