@@ -10,7 +10,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import Kyu.GuiAPI_Redone.GUI;
+import Kyu.GuiAPI_Redone.Exceptions.RowsOutOfBoundsException;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
+import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
 
 public abstract class Window implements InventoryHolder {
     
@@ -33,15 +35,44 @@ public abstract class Window implements InventoryHolder {
         this.title = title;
     }
 
-    public abstract void addItem(GuiItem item);
+    /**
+     * Add a {@link GuiItem} to the Inventory, it will find the nearest free slot
+     * and place it there
+     * @param item The item to add
+     */
+    public void addItem(GuiItem item) {
+        int nextFreeSlot = getNextFreeSlot();
+        if (nextFreeSlot == -1) {
+            return;
+        }
+        setItem(item, nextFreeSlot);
+    }
 
-    public abstract void setItem(GuiItem item, int slot);
+    /**
+     * Same as {@link ChestWindow#addItem(GuiItem)} but accepts a Slot
+     * <p>
+     * If the slot is used, it will override the item
+     * @param item The item to add
+     * @param slot The slot to place it in
+     * @throws SlotOufOfBoundsException if the slot is less than 0 or greater than the inventory size
+     */
+    public void setItem(GuiItem item, int slot) {
+        item.addWindow(this);
+        set(item, slot);
+    }
+
+    /*
+     * Actual Logic of the item setting
+     */
+    protected abstract void set(GuiItem item, int slot);
 
     /**
      * Removes the item from the provided slot
      * @param slot Slot to remove the item from
      */
     public void removeItem(int slot) {
+        GuiItem item = items.get(slot);
+        item.removeWindow(this);
         items.remove(slot);
     }
 
@@ -112,6 +143,7 @@ public abstract class Window implements InventoryHolder {
     /**
      * 
      * @param isIgnoreCloseEvent Whether or not the close Event will be ignored. If true, the onClose Consumer will not be called
+     * <b>Keep in mind that setting this to true will also result in the {@link WindowListener} not being unregistered on Inventory closed, so you will have to handle this manually</b>
      */
     public void setIgnoreCloseEvent(boolean isIgnoreCloseEvent) {
         this.isIgnoreCloseEvent = isIgnoreCloseEvent;

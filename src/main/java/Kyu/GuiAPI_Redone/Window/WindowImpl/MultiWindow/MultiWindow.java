@@ -102,12 +102,7 @@ public abstract class MultiWindow {
      */
     public void removeWindow(ChestWindow window) {
         int removedIndex = windows.indexOf(window);
-        windows.remove(window);
-        if (!closeIfNoWindows()) {
-            if (removedIndex == currIndex) {
-                handleCloseCurrentWindow();
-            }
-        }
+        removeWindow(removedIndex);
     }
 
     /**
@@ -119,6 +114,8 @@ public abstract class MultiWindow {
         if (!closeIfNoWindows()) {
             if (index == currIndex) {
                 handleCloseCurrentWindow();
+            } else {
+                refreshPaginationBar();
             }
         }
     }

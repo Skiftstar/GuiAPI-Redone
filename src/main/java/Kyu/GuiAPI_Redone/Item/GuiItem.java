@@ -120,7 +120,7 @@ public class GuiItem {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.displayName(Component.text(TextUtil.color(name)));
         itemStack.setItemMeta(itemMeta);
-        //TODO: Check if inventory Refresh is needed
+        updateLinkedWindows();
     }
 
     /**

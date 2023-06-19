@@ -1,6 +1,8 @@
 package Kyu.GuiAPI_Redone.Window;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -16,24 +18,35 @@ public class WindowListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    public void unregister() {
+        Bukkit.broadcastMessage("Listener yeeted");
+        HandlerList.unregisterAll(this);
+    }
+
     @EventHandler
     private void onInventoryClose(InventoryCloseEvent e) {
         if (shouldIgnoreInventoryEvent(e.getInventory())) return;
 
         Window closedWindow = (Window) e.getInventory().getHolder();
 
-        if (closedWindow.isIgnoreCloseEvent()) return;
+        if (closedWindow.isIgnoreCloseEvent()) {
+            return;
+        }
 
         if (closedWindow.isPreventClose()) {
             e.getPlayer().openInventory(closedWindow.getInventory());
         }
         
-        if (closedWindow.getOnClose() == null) return;
+        if (closedWindow.getOnClose() == null) {
+            unregister();
+            return;
+        }
         closedWindow.getOnClose().accept(e);
     }
 
     @EventHandler
     private void onInventoryClick(InventoryClickEvent e) {
+        Bukkit.broadcastMessage("Click Fired");
         if (shouldIgnoreInventoryEvent(e.getClickedInventory())) return;
 
         Window clickedWindow = (Window) e.getClickedInventory().getHolder();

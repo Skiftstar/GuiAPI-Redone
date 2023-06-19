@@ -27,9 +27,10 @@ public final class Main extends JavaPlugin {
         Player p = (Player) sender;
         GUI gui = new GUI(p, this);
 
-        MultiWindowTest window = new MultiWindowTest(gui, p);
-        window.open();
+        TestWindow window = new TestWindow(gui, p);
         
+        gui.openWindow(window);
+
         return true;
     }
 }

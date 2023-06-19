@@ -22,8 +22,6 @@ public class GUI {
     public GUI(Player holder, JavaPlugin plugin) {
         this.holder = holder;
         this.plugin = plugin;
-        //TODO: Check if automatically removed from listeners when gui no longer used
-        //FIXME: Testing says, won't be removed
         this.listener = new WindowListener(plugin);
     }
 
@@ -32,11 +30,26 @@ public class GUI {
      * @param window {@link Window} to open
      */
     public void openWindow(Window window) {
+        // Cache ignoreCloseEvent, because otherwise it will always be true if changing between windows
+        Window oldWindow = currentWindow;
+        boolean cachedIgnoreCloseEvent = oldWindow == null ? false : oldWindow.isIgnoreCloseEvent();
         if (currentWindow != null) {
             currentWindow.setIgnoreCloseEvent(true);
         }
         this.currentWindow = window;
         holder.openInventory(window.getInventory());
+
+        // Set cached value for previous Window
+        if (oldWindow != null) {
+            oldWindow.setIgnoreCloseEvent(cachedIgnoreCloseEvent);
+        }
+    }
+
+    /**
+     * Unregisters the Window Listener, not recommended to call while a window is still open, as this breaks most of the functionality
+     */
+    public void unregisterListener() {
+        listener.unregister();
     }
 
     /**

@@ -1,5 +1,6 @@
 package Kyu.GuiAPI_Redone.Testing;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -19,11 +20,17 @@ public class TestWindow extends ChestWindow {
 
     private void build() {
         setPreventClose(false);
-
-        GuiItem statsItem = new GuiItem(Material.OAK_PLANKS, "Name", 1)
-            .withListener(e -> {
-                player.setHealth(0);
+        
+        GuiItem statsItem = new GuiItem(Material.OAK_PLANKS, "Name", 1);
+        statsItem.withListener(e -> {
+                statsItem.setName("test");
         });
+
+        //FIXME: Listener on the new Window isn't working
+        setOnClose(e -> {
+            getGui().openWindow(new TestWindow(getGui(), player));
+        });
+
         setItem(statsItem, 13);
     }   
 }

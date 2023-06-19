@@ -31,32 +31,13 @@ public abstract class ChestWindow extends Window {
         setInventory(Bukkit.createInventory(this, rows * 9, Component.text(TextUtil.color(title))));
     }
 
-        /**
-     * Add a {@link GuiItem} to the Inventory, it will find the nearest free slot
-     * and place it there
-     * @param item The item to add
-     */
-    public void addItem(GuiItem item) {
-        int nextFreeSlot = getNextFreeSlot();
-        if (nextFreeSlot == -1) {
-            return;
-        }
-        setItem(item, nextFreeSlot);
-    }
 
-    /**
-     * Same as {@link ChestWindow#addItem(GuiItem)} but accepts a Slot
-     * <p>
-     * If the slot is used, it will override the item
-     * @param item The item to add
-     * @param slot The slot to place it in
-     * @throws SlotOufOfBoundsException if the slot is less than 0 or greater than the inventory size
-     */
-    public void setItem(GuiItem item, int slot) {
+    public void set(GuiItem item, int slot) {
         int maxSlot = rows * 9 - 1;
         if (slot < 0 || slot > maxSlot) {
             throw new SlotOutOfBoundsException(slot, maxSlot);
         }
+        item.addWindow(this);
         getItems().put(slot, item);
         getInventory().setItem(slot, item.getItemStack());
     }
