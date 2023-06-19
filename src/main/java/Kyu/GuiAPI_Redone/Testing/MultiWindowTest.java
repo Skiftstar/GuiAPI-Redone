@@ -15,7 +15,7 @@ public class MultiWindowTest extends MultiWindow {
 
     public MultiWindowTest(GUI gui, Player player) {
         super(gui, new PaginationBar());
-        getPaginationBar().setToolbarItems(Material.WHITE_STAINED_GLASS_PANE, Material.OAK_SIGN);
+        // getPaginationBar().setToolbarItems(Material.WHITE_STAINED_GLASS_PANE, Material.OAK_SIGN);
         this.player = player;
         build();
     }

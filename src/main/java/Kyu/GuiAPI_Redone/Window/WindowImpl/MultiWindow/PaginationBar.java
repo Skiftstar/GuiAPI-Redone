@@ -13,7 +13,39 @@ import net.kyori.adventure.text.Component;
 public class PaginationBar {
 
     private String placeholderText = " ", pageForwText = "To Page %page/%max", pageBackText = "To Page %page/%max";
-    private Material placeholderItem = Material.GRAY_STAINED_GLASS_PANE, pageItem = Material.ARROW;
+    private ItemStack placeholderItem, pageItemForw, pageItemBackw;
+
+    public PaginationBar() {
+        buildDefaults();
+    }
+
+    /**
+     * Set the default toolbar Items for the Windows
+     * @param placeholderItem ItemStack of the Placeholder Item
+     * @param pageItemForw ItemStack of the Item to go to the next page
+     * @param pageItemBackw ItemStack of the Item to go to the previous page
+     * @return
+     */
+    public PaginationBar setToolbarItems(ItemStack placeholderItem, ItemStack pageItemForw, ItemStack pageItemBackw) {
+        this.placeholderItem = placeholderItem;
+        this.pageItemForw = pageItemForw;
+        this.pageItemBackw = pageItemBackw;
+        return this;
+    }
+
+    /**
+     * Set the default toolbar Items for the Windows
+     * @param placeholderItem Material of the Placeholder Item
+     * @param pageItemForw Material of the Item to go to the next page
+     * @param pageItemBackw Material of the Item to go to the previous page
+     * @return
+     */
+     public PaginationBar setToolbarItems(Material placeholderItem, Material pageItemForw, Material pageItemBackw) {
+        ItemStack placeholder = new ItemStack(placeholderItem);
+        ItemStack pageItemstackForw = new ItemStack(pageItemForw);
+        ItemStack pageItemstackBackw = new ItemStack(pageItemBackw);
+        return setToolbarItems(placeholder, pageItemstackForw, pageItemstackBackw);
+    }
 
     /**
      * Set the default toolbar Items for the Windows
@@ -21,9 +53,7 @@ public class PaginationBar {
      * @param pageItem Material of the Item to change Pages
      */
     public PaginationBar setToolbarItems(Material placeholderItem, Material pageItem) {
-        this.placeholderItem = placeholderItem;
-        this.pageItem = pageItem;
-        return this;
+        return setToolbarItems(placeholderItem, pageItem, pageItem);
     }
 
     /**
@@ -44,30 +74,27 @@ public class PaginationBar {
         GuiItem[] items = new GuiItem[9];
         int pageNum = windowIndex + 1;
 
-        ItemStack placeholderItem = new ItemStack(getPlaceholderItem());
         ItemMeta meta = placeholderItem.getItemMeta();
         meta.displayName(Component.text(TextUtil.color(getPlaceholderText())));
         placeholderItem.setItemMeta(meta);
 
-        ItemStack pageForwItem = new ItemStack(getPageItem());
-        meta = pageForwItem.getItemMeta();
+        meta = pageItemForw.getItemMeta();
         meta.displayName(Component.text(TextUtil.color(getPageForwText()
             .replace("%page", "" + (pageNum + 1))
             .replace("%max", "" + maxPages))));
-        pageForwItem.setItemMeta(meta);
+        pageItemForw.setItemMeta(meta);
 
-        ItemStack pageBackItem = new ItemStack(getPageItem());
-        meta = pageBackItem.getItemMeta();
+        meta = pageItemBackw.getItemMeta();
         meta.displayName(Component.text(TextUtil.color(getPageBackText()
             .replace("%page", "" + (pageNum - 1))
             .replace("%max", "" + maxPages))));
-        pageBackItem.setItemMeta(meta);
+        pageItemBackw.setItemMeta(meta);
 
         GuiItem placeholder = new GuiItem(placeholderItem);
-        GuiItem pageForw = new GuiItem(pageForwItem).withListener(e -> {
+        GuiItem pageForw = new GuiItem(pageItemForw).withListener(e -> {
             multiWindow.openPage(windowIndex + 1);
         });
-        GuiItem pageBack = new GuiItem(pageBackItem).withListener(e -> {
+        GuiItem pageBack = new GuiItem(pageItemBackw).withListener(e -> {
             multiWindow.openPage(windowIndex - 1);
         });
 
@@ -80,7 +107,7 @@ public class PaginationBar {
         }
 
         if (previosPage != null) {
-            items[3] = pageBack;
+            items[2] = pageBack;
         }
 
         return items;
@@ -112,18 +139,29 @@ public class PaginationBar {
 
     /**
      * 
-     * @return The Material for the placeholder Item
+     * @return The ItemStack for the placeholder Item
      */
-    public Material getPlaceholderItem() {
+    public ItemStack getPlaceholderItem() {
         return placeholderItem;
     }
 
     /**
      * 
-     * @return The Material for the PageChange Items
+     * @return The ItemStack for the Page forward Item
      */
-    public Material getPageItem() {
-        return pageItem;
+    public ItemStack getPageForwardItem() {
+        return pageItemForw;
+    }
+
+    /**
+     * 
+     * @return The ItemStack for the Page backward Item
+     */
+    public ItemStack getPageBackwardItem() {
+        return pageItemBackw;
     }
     
+    private void buildDefaults() {
+        setToolbarItems(Material.GRAY_STAINED_GLASS_PANE, Material.ARROW);
+    }
 }
