@@ -168,6 +168,14 @@ public abstract class Window implements InventoryHolder {
     }
 
     /**
+     * 
+     * @return Title of the Window
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
      * Refreshes the Inventory
      */
     public void refreshInventory() {

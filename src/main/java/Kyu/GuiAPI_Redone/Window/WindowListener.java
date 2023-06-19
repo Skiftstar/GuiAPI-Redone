@@ -14,12 +14,14 @@ import Kyu.GuiAPI_Redone.Item.GuiItem;
 
 public class WindowListener implements Listener {
 
+    private JavaPlugin plugin;
+
     public WindowListener(JavaPlugin plugin) {
+        this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     public void unregister() {
-        Bukkit.broadcastMessage("Listener yeeted");
         HandlerList.unregisterAll(this);
     }
 
@@ -41,12 +43,14 @@ public class WindowListener implements Listener {
             unregister();
             return;
         }
-        closedWindow.getOnClose().accept(e);
+
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            closedWindow.getOnClose().accept(e);
+        });
     }
 
     @EventHandler
     private void onInventoryClick(InventoryClickEvent e) {
-        Bukkit.broadcastMessage("Click Fired");
         if (shouldIgnoreInventoryEvent(e.getClickedInventory())) return;
 
         Window clickedWindow = (Window) e.getClickedInventory().getHolder();

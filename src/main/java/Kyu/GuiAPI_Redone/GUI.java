@@ -60,4 +60,12 @@ public class GUI {
         return holder;
     }
 
+    /**
+     * 
+     * @return The plugin the GUI is connected to
+     */
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
+
 }
