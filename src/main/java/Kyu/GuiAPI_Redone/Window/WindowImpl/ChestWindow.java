@@ -31,6 +31,9 @@ public abstract class ChestWindow extends Window {
         setInventory(Bukkit.createInventory(this, rows * 9, Component.text(TextUtil.color(title))));
     }
 
+    /**
+     * Places an item in the windows, <b>without</b> linking the item to the window, use {@link Window#setItem(GuiItem, int)} instead
+     */
     protected void set(GuiItem item, int slot) {
         int maxSlot = rows * 9 - 1;
         if (slot < 0 || slot > maxSlot) {
