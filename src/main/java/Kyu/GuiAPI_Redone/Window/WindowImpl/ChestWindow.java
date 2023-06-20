@@ -31,8 +31,7 @@ public abstract class ChestWindow extends Window {
         setInventory(Bukkit.createInventory(this, rows * 9, Component.text(TextUtil.color(title))));
     }
 
-
-    public void set(GuiItem item, int slot) {
+    protected void set(GuiItem item, int slot) {
         int maxSlot = rows * 9 - 1;
         if (slot < 0 || slot > maxSlot) {
             throw new SlotOutOfBoundsException(slot, maxSlot);
