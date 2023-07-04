@@ -6,7 +6,7 @@ It is designed with customizeability and expandability in mind, if you don't lik
 
 ## Dependencies
 
-depends on [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
+Depends on [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
 
 ## Import via jitpack
 
