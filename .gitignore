@@ -3,6 +3,8 @@ Testing
 # User-specific stuff
 .idea/
 
+Testing/
+
 *.iml
 *.ipr
 *.iws
