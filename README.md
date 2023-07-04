@@ -4,6 +4,10 @@ This API speeds up and improves the process of creating GUIs for Minecraft plugi
 
 It is designed with customizeability and expandability in mind, if you don't like the preexisting Windows, you can easily expand upon them or make your own.
 
+## Dependencies
+
+Depends on [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
+
 ## Import via jitpack
 
 [Jitpack](https://jitpack.io/#Skiftstar/GuiAPI-Redone)
