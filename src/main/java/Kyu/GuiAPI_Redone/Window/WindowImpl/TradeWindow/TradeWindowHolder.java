@@ -4,12 +4,12 @@ import org.bukkit.entity.Player;
 
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.TextUtil;
-import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
+import Kyu.GuiAPI_Redone.Window.Openable;
 import net.kyori.adventure.text.TextComponent;
 
-public class TradeWindowHolder {
+public class TradeWindowHolder extends Openable {
 
-    private ChestWindow mainWindow, partnerWindow;
+    private TradeWindow mainWindow, partnerWindow;
     private Player partner;
     private GUI gui;
 
@@ -18,6 +18,7 @@ public class TradeWindowHolder {
     }
 
     public TradeWindowHolder(GUI gui, Player partner, String titleMain, String titlePartner) {
+        super(gui);
         titleMain = formatTitle(titleMain, partner);
         titlePartner = formatTitle(titlePartner, gui.getHolder());
 

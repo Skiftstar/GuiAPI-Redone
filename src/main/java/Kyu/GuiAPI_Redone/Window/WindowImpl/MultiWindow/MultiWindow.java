@@ -47,7 +47,7 @@ public abstract class MultiWindow extends Openable {
             currIndex = windows.size() - 1;
         }
 
-        getGui().openWindow(windows.get(currIndex));
+        getGui().getHolder().openInventory(windows.get(currIndex).getInventory());
     }
 
     /**

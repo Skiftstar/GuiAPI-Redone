@@ -17,7 +17,9 @@ public class TradeWindow extends ChestWindow {
         setPreventClose(true);
     }
 
-    
+    public void setToolbar() {
+        
+    }
     
 
 }
