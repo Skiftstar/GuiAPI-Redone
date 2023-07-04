@@ -32,6 +32,14 @@ public abstract class ChestWindow extends Window {
     }
 
     /**
+     * Calling directly can result in {@link GUI} not setting the current Window correctly!
+     * Use {@link GUI#openWindow(Kyu.GuiAPI_Redone.Window.Openable)} instead
+     */
+    public void open() {
+        getGui().getHolder().openInventory(getInventory());
+    }
+
+    /**
      * Places an item in the windows, <b>without</b> linking the item to the window, use {@link Window#setItem(GuiItem, int)} instead
      */
     protected void set(GuiItem item, int slot) {

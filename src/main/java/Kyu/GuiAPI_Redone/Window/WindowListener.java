@@ -11,7 +11,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 
-
+/**
+ * Listens for all Events connected to {@link Window}s
+ */
 public class WindowListener implements Listener {
 
     private JavaPlugin plugin;

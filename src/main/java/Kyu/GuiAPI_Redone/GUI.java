@@ -3,6 +3,7 @@ package Kyu.GuiAPI_Redone;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import Kyu.GuiAPI_Redone.Window.Openable;
 import Kyu.GuiAPI_Redone.Window.Window;
 import Kyu.GuiAPI_Redone.Window.WindowListener;
 
@@ -12,7 +13,7 @@ public class GUI {
     private Player holder;
     private WindowListener listener;
     private JavaPlugin plugin;
-    private Window currentWindow;
+    private Openable currentWindow;
 
     /**
      * Create a new GUI component
@@ -27,17 +28,17 @@ public class GUI {
 
     /**
      * 
-     * @param window {@link Window} to open
+     * @param window {@link Openable} to open
      */
-    public void openWindow(Window window) {
+    public void openWindow(Openable window) {
         // Cache ignoreCloseEvent, because otherwise it will always be true if changing between windows
-        Window oldWindow = currentWindow;
+        Openable oldWindow = currentWindow;
         boolean cachedIgnoreCloseEvent = oldWindow == null ? false : oldWindow.isIgnoreCloseEvent();
         if (currentWindow != null) {
             currentWindow.setIgnoreCloseEvent(true);
         }
         this.currentWindow = window;
-        holder.openInventory(window.getInventory());
+        window.open();
 
         // Set cached value for previous Window
         if (oldWindow != null) {

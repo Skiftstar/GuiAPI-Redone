@@ -2,20 +2,24 @@ package Kyu.GuiAPI_Redone.Window.WindowImpl.MultiWindow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+
+import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Exceptions.MultiWindowEmptyException;
 import Kyu.GuiAPI_Redone.Exceptions.NoPaginationPossibleException;
 import Kyu.GuiAPI_Redone.Exceptions.NoSuchPageException;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
+import Kyu.GuiAPI_Redone.Window.Openable;
 import Kyu.GuiAPI_Redone.Window.Window;
+import Kyu.GuiAPI_Redone.Window.WindowListener;
 import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
 
-public abstract class MultiWindow {
+public abstract class MultiWindow extends Openable {
     
     private List<ChestWindow> windows = new ArrayList<>();
     private int currIndex = 0;
-    private GUI gui;
     private PaginationBar paginationBar;
 
     /**
@@ -24,11 +28,13 @@ public abstract class MultiWindow {
      * @param paginationBar The {@link PaginationBar} to use
      */
     public MultiWindow(GUI gui, PaginationBar paginationBar) {
-        this.gui = gui;
+        super(gui);
         this.paginationBar = paginationBar;
     }
 
-    /**
+    /** 
+     * Calling directly can result in {@link GUI} not setting the current Window correctly!
+     * Use {@link GUI#openWindow(Kyu.GuiAPI_Redone.Window.Openable)} instead
      * Opens the Window, either on index 0 if first open or the window it was previously on if opened again
      * @throws MultiWindowEmptyException If the MultiWindow has not had any {@link Window}s added yet
      */
@@ -41,7 +47,7 @@ public abstract class MultiWindow {
             currIndex = windows.size() - 1;
         }
 
-        gui.openWindow(windows.get(currIndex));
+        getGui().openWindow(windows.get(currIndex));
     }
 
     /**
@@ -56,7 +62,7 @@ public abstract class MultiWindow {
 
         currIndex = index;
         refreshPaginationBar();
-        gui.openWindow(windows.get(index));
+        getGui().openWindow(windows.get(index));
     }
 
     /**
@@ -121,13 +127,6 @@ public abstract class MultiWindow {
     }
 
     /**
-     * @return The {@link GUI} the Window is connected to
-     */
-    public GUI getGui() {
-        return gui;
-    }
-
-    /**
      * @return The {@link PaginationBar} for the {@link Window}s
      */
     public PaginationBar getPaginationBar() {
@@ -148,9 +147,64 @@ public abstract class MultiWindow {
         return currIndex;
     }
 
+    /**
+     * 
+     * @param isIgnoreCloseEvent Whether or not the close Event will be ignored. If true, the onClose Consumer will not be called
+     * <p>
+     * Does not do anything for the MultiWindow, but sets the flag for <b>ALL WINDOWS</b> contained in this MultiWindow
+     * <b>Keep in mind that setting this to true will also result in the {@link WindowListener} not being unregistered on Inventory closed, so you will have to handle this manually</b>
+     */
+    public void setIgnoreCloseEvent(boolean isIgnoreCloseEvent) {
+        super.setIgnoreCloseEvent(isIgnoreCloseEvent);
+        for (Window window : windows) {
+            window.setIgnoreCloseEvent(isIgnoreCloseEvent);
+        }
+    }
+
+    /**
+     * 
+     * @param onClose Function to call when the inventory gets closed and {@link Openable#isIgnoreCloseEvent()} is False.
+     * Automatically disables {@link Openable#isPreventClose}
+     * <p>
+     * Does not do anything for the MultiWindow, but sets the onClose Function for <b>ALL WINDOWS</b> container in this MultiWindow
+     */
+    public void setOnClose(Consumer<InventoryCloseEvent> onClose) {
+        super.setOnClose(onClose);
+        for (Window window : windows) {
+            window.setOnClose(onClose);
+        }
+    }
+
+    /**
+     * 
+     * @param preventClose Whether or not the user shall be able to close the window with ESC
+     * <p>
+     * Does not do anything for the MultiWindow, but sets the flag for <b>ALL WINDOWS</b> contained in this MultiWindow
+     */
+    public void setPreventClose(boolean preventClose) {
+        super.setPreventClose(preventClose);
+        for (Window window : windows) {
+            window.setPreventClose(preventClose);
+        }
+    }
+
+    /**
+     * Set whether or not InventoryClickEvent is canceled or not. Canceling prevents users from taking/placing items from the inventory
+     * <p>
+     * Does not do anything for the MultiWindow, but sets the flag for <b>ALL WINDOWS</b> contained in this MultiWindow
+     * @param disableClickEvent Whether or not to cancel InventoryClickEvent
+     */
+    public void setDisableClickEvent(boolean disableClickEvent) {
+        super.setDisableClickEvent(disableClickEvent);
+        for (Window window : windows) {
+            window.setDisableClickEvent(disableClickEvent);
+        }
+    }
+
+
     private boolean closeIfNoWindows() {
         if (windows.isEmpty()) {
-            gui.getHolder().closeInventory();
+            getGui().getHolder().closeInventory();
             return true;
         }
         return false;
@@ -158,7 +212,7 @@ public abstract class MultiWindow {
 
     private void refreshPaginationBar() {
         ChestWindow window = windows.get(currIndex);
-        GuiItem[] paginationItems = paginationBar.buildPaginationBar(this, currIndex, windows.size(), getNextWindow(), getPreviousWindow(), gui);
+        GuiItem[] paginationItems = paginationBar.buildPaginationBar(this, currIndex, windows.size(), getNextWindow(), getPreviousWindow(), getGui());
 
         int firstSlotOfLastRow = (window.getRows() - 1) * 9;
         for (int itemIndex = 0; itemIndex < paginationItems.length; itemIndex++) {
@@ -174,7 +228,7 @@ public abstract class MultiWindow {
             window = windows.get(--currIndex);
         }
         refreshPaginationBar();
-        gui.openWindow(window);
+        getGui().openWindow(window);
     }
 
 }
