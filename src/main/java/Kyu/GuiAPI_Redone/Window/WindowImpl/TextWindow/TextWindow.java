@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Window.Openable;
 import Kyu.GuiAPI_Redone.Window.WindowImpl.TextWindow.API.SignGUIAPI;
@@ -36,6 +38,7 @@ public abstract class TextWindow extends Openable {
                 .plugin(getGui().getPlugin())
                 .build()
                 .open();
+
     }
 
     /**
@@ -70,5 +73,15 @@ public abstract class TextWindow extends Openable {
     public void setOnSubmit(Consumer<List<String>> onSubmit) {
         this.onSubmit = onSubmit;
     }
+
+    /**
+     * Disabled for this window
+     */
+    public void setDisableClickEvent(boolean disableClickEvent) {}
+
+    /**
+     * Disabled for this window, Closing the sign just calls {@link TextWindow#getOnSubmit()} 
+     */
+    public void setOnClose(Consumer<InventoryCloseEvent> onClose) {}
 
 }
