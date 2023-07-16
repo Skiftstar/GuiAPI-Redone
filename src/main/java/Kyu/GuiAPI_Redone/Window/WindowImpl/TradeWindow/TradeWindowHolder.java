@@ -11,6 +11,7 @@ public class TradeWindowHolder extends Openable {
 
     private TradeWindow mainWindow, partnerWindow;
     private Player partner;
+    private TradeToolbar toolbar = new TradeToolbar();
     private GUI gui;
 
     public TradeWindowHolder(GUI gui, Player partner, String title) {
@@ -31,6 +32,14 @@ public class TradeWindowHolder extends Openable {
 
     public void close() {
         
+    }
+
+    public void setToolbar(TradeToolbar toolbar) {
+        this.toolbar = toolbar;
+    }
+
+    public TradeToolbar getToolbar() {
+        return toolbar;
     }
 
     public GUI getGui() {
