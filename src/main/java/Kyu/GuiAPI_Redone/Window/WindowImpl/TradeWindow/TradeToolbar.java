@@ -1,6 +1,7 @@
 package Kyu.GuiAPI_Redone.Window.WindowImpl.TradeWindow;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -61,7 +62,7 @@ public class TradeToolbar {
         this.notReadyIndicatorText = TextUtil.color(notReadyIndicatorText);
     }
 
-    public GuiItem[] buildTradeToolBar(boolean ownPartyReady, boolean otherPartyReady, GUI gui) {
+    public GuiItem[] buildTradeToolBar(TradeWindowHolder window, Player windowHolder, boolean ownPartyReady, boolean otherPartyReady, GUI gui) {
         GuiItem[] items = new GuiItem[9];
 
         ItemMeta meta = setReadyItem.getItemMeta();
@@ -85,7 +86,9 @@ public class TradeToolbar {
         readyIndicator.setItemMeta(meta);
 
         items[0] = new GuiItem(abortItem);
-        items[4] = new GuiItem(ownPartyReady ? setNotReadyItem : setReadyItem);
+        items[4] = new GuiItem(ownPartyReady ? setNotReadyItem : setReadyItem).withListener(e -> {
+            window.toggleReady(windowHolder);
+        });
         for (int i = 1; i < 4; i++) {
             items[i] = new GuiItem(ownPartyReady ? readyIndicator : notReadyIndicator);
         }
