@@ -1,25 +1,31 @@
 package Kyu.GuiAPI_Redone.Window.WindowImpl.TradeWindow;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.TextUtil;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Window.Openable;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
 public class TradeWindowHolder extends Openable {
 
     private TradeWindow mainWindow, partnerWindow;
     private Player partner;
+    private Map<Player, List<GuiItem>> tradeItems = new HashMap<>();
     private TradeToolbar toolbar = new TradeToolbar();
-    private ItemStack spacerItem = new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1);
-    private String spacerName = " ";
+    private ItemStack spacerItem;
+    private String spacerName;
     private GUI gui;
 
     public TradeWindowHolder(GUI gui, Player partner, String title) {
@@ -31,16 +37,22 @@ public class TradeWindowHolder extends Openable {
         titleMain = formatTitle(titleMain, partner);
         titlePartner = formatTitle(titlePartner, gui.getHolder());
 
-        mainWindow = new TradeWindow(this, getGui().getHolder(), 6, TextUtil.color(titleMain));
-        partnerWindow = new TradeWindow(this, partner, 6, TextUtil.color(titlePartner));
+        tradeItems.put(gui.getHolder(), new ArrayList<>());
+        tradeItems.put(partner, new ArrayList<>());
+
+        mainWindow = new TradeWindow(this, getGui().getHolder(), TextUtil.color(titleMain));
+        partnerWindow = new TradeWindow(this, partner, TextUtil.color(titlePartner));
+
+        setSpacer(Material.LIGHT_GRAY_STAINED_GLASS_PANE, " ");
     }
 
     public void open() {
-
+        getGui().getHolder().openInventory(mainWindow.getInventory());
+        partner.openInventory(partnerWindow.getInventory());
     }
 
     public void close() {
-        
+        //TODO:: unregister Listener, etc.
     }
 
     public void addTradeItem(Player p, ItemStack item) {
@@ -54,22 +66,25 @@ public class TradeWindowHolder extends Openable {
         }
         GuiItem guiItem = new GuiItem(item);
         guiItem.withListener(e -> {
-            removeTradeItem(guiItem);
+            removeTradeItem(p, guiItem);
         });
         window.addItem(guiItem);
         mainWindow.reloadItems();
         partnerWindow.reloadItems();
     }
 
-    public void removeTradeItem(GuiItem item) {
-        int slot = 
+    public void removeTradeItem(Player p, GuiItem item) {
+        tradeItems.get(p).remove(item);
+        mainWindow.reloadItems();
+        partnerWindow.reloadItems();
     }
 
-    public void removeTradeItem(int slot) {
-
+    public List<GuiItem> getOppositeItems(TradeWindow initialWindow) {
+        Player p = initialWindow.getPlayer();
+        return tradeItems.get(p.equals(partner) ? getGui().getHolder() : partner);
     }
 
-    public List<GuiItem> getTradeItems() {
+    public Map<Player, List<GuiItem>> getTradeItems() {
         return tradeItems;
     }
 
@@ -102,8 +117,16 @@ public class TradeWindowHolder extends Openable {
      * @param name name of the spacer, will be color translated
      */
     public void setSpacer(ItemStack item, String name) {
-        this.spacerItem = item;
         this.spacerName = TextUtil.color(name);
+
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(Component.text(spacerName));
+        item.setItemMeta(meta);
+
+        this.spacerItem = item;
+
+        mainWindow.setSpacer();
+        partnerWindow.setSpacer();
     }
 
     /**
@@ -125,6 +148,10 @@ public class TradeWindowHolder extends Openable {
 
     public GUI getGui() {
         return gui;
+    }
+
+    public ItemStack getSpacerItem() {
+        return spacerItem;
     }
 
     private String formatTitle(String in, Player oppositePlayer) {

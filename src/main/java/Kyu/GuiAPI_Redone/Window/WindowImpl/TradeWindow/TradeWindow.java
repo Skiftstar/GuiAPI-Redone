@@ -1,11 +1,9 @@
 package Kyu.GuiAPI_Redone.Window.WindowImpl.TradeWindow;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
 
@@ -13,21 +11,40 @@ public class TradeWindow extends ChestWindow {
 
     private Player player;
     private boolean ready;
-    private List<GuiItem> tradeItems = new ArrayList<>();
+    private TradeWindowHolder parentWindow;
 
-    public TradeWindow(TradeWindowHolder holder, Player player, int rows, String title) {
-        super(holder.getGui(), rows, title);
+    public TradeWindow(TradeWindowHolder holder, Player player, String title) {
+        super(holder.getGui(), 6, title);
         this.player = player;
+        this.parentWindow = holder;
 
         setPreventClose(true);
     }
 
     public void reloadItems() {
-
+        final Map<Player, List<GuiItem>> items = parentWindow.getTradeItems();
+        List<GuiItem> ownItems, otherItems;
+        for (Player p : items.keySet()) {
+            if (p.equals(this.player)) {
+                ownItems = items.get(p);
+            } else {
+                otherItems = items.get(p);
+            }
+        }
+        //TODO: Set actual items
+        
+        
     }
 
     public void setToolbar() {
-        
+        //TODO: this
+    }
+
+    public void setSpacer() {
+        GuiItem spacerItem = new GuiItem(parentWindow.getSpacerItem());
+        for (int i = 4; i < 9 * 5; i += 9) {
+            setItem(spacerItem, i);
+        }
     }
 
     public void setReady(boolean ready) {
@@ -39,7 +56,12 @@ public class TradeWindow extends ChestWindow {
     }
 
     public int getNextFreeSlot() {
-        return super.getNextFreeSlot();
+        //TODO: Change logic cuz this shit is not functional
+        return parentWindow.getTradeItems().get(player).size() < 5 * 4 ? parentWindow.getTradeItems().get(player).size() : -1;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
     
 
