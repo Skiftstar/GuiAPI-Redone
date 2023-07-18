@@ -6,7 +6,7 @@ It is designed with customizeability and expandability in mind, if you don't lik
 
 ## Dependencies
 
-Depends on [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
+Depends on [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) if the [TextWindow](https://skiftstar.github.io/GuiAPI-Redone/Kyu/GuiAPI_Redone/Window/WindowImpl/TextWindow/TextWindow.html) is used
 
 ## Import via jitpack
 
