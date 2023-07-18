@@ -31,8 +31,18 @@ public abstract class ChestWindow extends Window {
         setInventory(Bukkit.createInventory(this, rows * 9, Component.text(TextUtil.color(title))));
     }
 
+    /**
+     * Calling directly can result in {@link GUI} not setting the current Window correctly!
+     * Use {@link GUI#openWindow(Kyu.GuiAPI_Redone.Window.Openable)} instead
+     */
+    public void open() {
+        getGui().getHolder().openInventory(getInventory());
+    }
 
-    public void set(GuiItem item, int slot) {
+    /**
+     * Places an item in the windows, <b>without</b> linking the item to the window, use {@link Window#setItem(GuiItem, int)} instead
+     */
+    protected void set(GuiItem item, int slot) {
         int maxSlot = rows * 9 - 1;
         if (slot < 0 || slot > maxSlot) {
             throw new SlotOutOfBoundsException(slot, maxSlot);
