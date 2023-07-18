@@ -23,24 +23,3 @@ https://skiftstar.github.io/GuiAPI-Redone/
 ## Documentation and Exmaples
 
 Please Check the Wiki for this
-
-TextWindow (for UserInput):
-
-```
-public class TextWindowTest extends TextWindow {
-    
-    public TextWindowTest(GUI gui) {
-        super(gui);
-
-        //Initial Lines displayed when the sign opens
-        setInitalLines("Line 1", "", "Line 3", "Line 4", "Line 5");
-        
-        //Function that gets executed when the user submits input
-        //lines is a List<String> with Size 4
-        setOnSubmit(lines -> {
-            Bukkit.broadcastMessage(lines.get(0));   
-        });
-    }
-
-}
-```
