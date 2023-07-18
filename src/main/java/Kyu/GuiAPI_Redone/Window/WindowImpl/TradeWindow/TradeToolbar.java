@@ -85,7 +85,9 @@ public class TradeToolbar {
         meta.displayName(Component.text(readyIndicatorText));
         readyIndicator.setItemMeta(meta);
 
-        items[0] = new GuiItem(abortItem);
+        items[0] = new GuiItem(abortItem).withListener(e -> {
+            window.handlePlayerClose(windowHolder);
+        });
         items[4] = new GuiItem(ownPartyReady ? setNotReadyItem : setReadyItem).withListener(e -> {
             window.toggleReady(windowHolder);
         });

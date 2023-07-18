@@ -1,7 +1,6 @@
 package Kyu.GuiAPI_Redone.Window.WindowImpl.TradeWindow;
 
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.entity.Player;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
@@ -10,7 +9,6 @@ import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
 public class TradeWindow extends ChestWindow {
 
     private Player player;
-    private boolean ready;
     private TradeWindowHolder parentWindow;
 
     public TradeWindow(TradeWindowHolder holder, Player player, String title) {
@@ -18,26 +16,39 @@ public class TradeWindow extends ChestWindow {
         this.player = player;
         this.parentWindow = holder;
 
+        //TODO: This is buggy
         setPreventClose(true);
     }
 
     public void reloadItems() {
-        final Map<Player, List<GuiItem>> items = parentWindow.getTradeItems();
-        List<GuiItem> ownItems, otherItems;
-        for (Player p : items.keySet()) {
-            if (p.equals(this.player)) {
-                ownItems = items.get(p);
-            } else {
-                otherItems = items.get(p);
-            }
+        List<GuiItem> ownItems = parentWindow.getTradeItems().getOwnItems(player);
+        List<GuiItem> otherItems = parentWindow.getTradeItems().getOtherItems(player);
+
+        clearItems();
+
+        for (int i = 0; i < ownItems.size(); i++) {
+            int slot = Math.floorDiv(i, 4) * 9 + i % 4;
+            setItem(ownItems.get(i), slot);
         }
-        //TODO: Set actual items
-        
-        
+
+        for (int i = 0; i < otherItems.size(); i++) {
+            int slot = (Math.floorDiv(i, 4) * 9 + i % 4) + 5;
+            setItem(otherItems.get(i), slot);
+        }
+
+        setToolbar();
+        setSpacer();
     }
 
     public void setToolbar() {
-        //TODO: this
+        TradeToolbar toolbar = parentWindow.getToolbar();
+        boolean[] partiesReady = parentWindow.getArePartiesReady(player);
+        GuiItem[] toolbarItems = toolbar.buildTradeToolBar(parentWindow, player, partiesReady[0], partiesReady[1], getGui());
+        for (int i = 0; i < toolbarItems.length; i++) {
+            GuiItem item = toolbarItems[i];
+            int slot = 5 * 9 + i;
+            setItem(item, slot);
+        }
     }
 
     public void setSpacer() {
@@ -47,17 +58,10 @@ public class TradeWindow extends ChestWindow {
         }
     }
 
-    public void setReady(boolean ready) {
-        this.ready = ready;
-    }
-
-    public boolean isReady() {
-        return ready;
-    }
-
     public int getNextFreeSlot() {
-        //TODO: Change logic cuz this shit is not functional
-        return parentWindow.getTradeItems().get(player).size() < 5 * 4 ? parentWindow.getTradeItems().get(player).size() : -1;
+        List<GuiItem> items = parentWindow.getTradeItems().getOwnItems(player);
+        int nextFreeSlot = ((Math.floorDiv(items.size(), 4) * 9) + (items.size() % 4));
+        return items.size() < 5 * 4 ? nextFreeSlot : -1;
     }
 
     public Player getPlayer() {

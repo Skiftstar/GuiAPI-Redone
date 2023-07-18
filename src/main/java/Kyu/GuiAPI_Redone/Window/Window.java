@@ -8,7 +8,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import Kyu.GuiAPI_Redone.GUI;
-import Kyu.GuiAPI_Redone.Exceptions.RowsOutOfBoundsException;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 import Kyu.GuiAPI_Redone.Window.WindowImpl.ChestWindow;
 
@@ -22,13 +21,19 @@ public abstract class Window extends Openable implements InventoryHolder {
     /**
      * Creates a new window to be used in a gui
      * @param gui The {@link GUI} to use
-     * @param rows The amount of Rows per Page (1 - 6)
      * @param title The title of the Window (will be color translated)
-     * @throws RowsOutOfBoundsException if rows are less than 1 or greater than 6
      */
     public Window(GUI gui, String title) {
         super(gui);
         this.title = title;
+    }
+
+    /**
+     * Clears the inventory of all items
+     */
+    public void clearItems() {
+        items.clear();
+        inv.clear();
     }
 
     /**

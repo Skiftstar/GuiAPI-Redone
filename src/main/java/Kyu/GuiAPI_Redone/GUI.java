@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import Kyu.GuiAPI_Redone.Window.Openable;
-import Kyu.GuiAPI_Redone.Window.Window;
 import Kyu.GuiAPI_Redone.Window.WindowListener;
 
 
