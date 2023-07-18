@@ -12,6 +12,10 @@ Depends on [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
 
 [Jitpack](https://jitpack.io/#Skiftstar/GuiAPI-Redone)
 
+## Wiki
+
+The wiki can be found [here](https://github.com/Skiftstar/GuiAPI-Redone/wiki)
+
 ## JavaDoc
 
 https://skiftstar.github.io/GuiAPI-Redone/
