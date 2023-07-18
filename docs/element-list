@@ -5,3 +5,6 @@ Kyu.GuiAPI_Redone.Testing
 Kyu.GuiAPI_Redone.Window
 Kyu.GuiAPI_Redone.Window.WindowImpl
 Kyu.GuiAPI_Redone.Window.WindowImpl.MultiWindow
+Kyu.GuiAPI_Redone.Window.WindowImpl.TextWindow
+Kyu.GuiAPI_Redone.Window.WindowImpl.TextWindow.API
+Kyu.GuiAPI_Redone.Window.WindowImpl.TradeWindow
