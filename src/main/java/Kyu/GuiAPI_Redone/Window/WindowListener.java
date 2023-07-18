@@ -38,11 +38,18 @@ public class WindowListener implements Listener {
         }
 
         if (closedWindow.isPreventClose()) {
-            e.getPlayer().openInventory(closedWindow.getInventory());
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                e.getPlayer().openInventory(closedWindow.getInventory());
+            });
+            return;
         }
         
-        if (closedWindow.getOnClose() == null) {
+        if (closedWindow.unregisterOnClose) {
             unregister();
+            return;
+        }
+
+        if (closedWindow.getOnClose() == null) {
             return;
         }
 

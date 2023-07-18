@@ -9,6 +9,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+/**
+ * Listens for clicks in the PlayerInventory
+ */
 public class TradeWindowListener implements Listener {
     
     private TradeWindowHolder tradeHolder;

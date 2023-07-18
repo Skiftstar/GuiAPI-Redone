@@ -9,7 +9,7 @@ import Kyu.GuiAPI_Redone.GUI;
 public abstract class Openable {
     
     protected Consumer<InventoryCloseEvent> onClose;
-    protected boolean disableClickEvent = true, isIgnoreCloseEvent = false, preventClose = true;
+    protected boolean disableClickEvent = true, isIgnoreCloseEvent = false, preventClose = true, unregisterOnClose = true;
     protected GUI gui;
 
     public Openable(GUI gui) {
@@ -77,12 +77,26 @@ public abstract class Openable {
 
     /**
      * 
-     * @param onClose Function to call when the inventory gets closed and {@link Openable#isIgnoreCloseEvent()} is False.
-     * Automatically disables {@link Openable#isPreventClose()}
+     * @param onClose Function to call when the inventory gets closed and {@link Openable#isIgnoreCloseEvent()} as well as {@link Openable#isPreventClose()} are False.
+     * Automatically disables {@link Openable#isPreventClose()} and {@link Openable#isUnregisterOnClose()} so you have to manually call {@link GUI#unregisterListener()} when your Windows are closed
      */
     public void setOnClose(Consumer<InventoryCloseEvent> onClose) {
-        this.preventClose = false;
+        this.setPreventClose(false);
         this.onClose = onClose;
+    }
+
+    /**
+     * @param unregisterOnClose Set whether or not to automatically unregister the listeners when the window is closed and no {@link Openable#setOnClose(Consumer)} is set
+     */
+    public void setUnregisterOnClose(boolean unregisterOnClose) {
+        this.unregisterOnClose = unregisterOnClose;
+    }
+
+    /**
+     * @return Whether or not to automatically unregister the listeners when the window is closed and no {@link Openable#setOnClose(Consumer)} is set
+     */
+    public boolean isUnregisterOnClose() {
+        return unregisterOnClose;
     }
 
     /**

@@ -11,15 +11,23 @@ public class TradeWindow extends ChestWindow {
     private Player player;
     private TradeWindowHolder parentWindow;
 
+    /**
+     * Creates a new Windows able to display the trades
+     * @param holder {@link TradeWindowHolder} which controls the trade
+     * @param player the Player that will view this window
+     * @param title the title of the window, will be color translated
+     */
     public TradeWindow(TradeWindowHolder holder, Player player, String title) {
         super(holder.getGui(), 6, title);
         this.player = player;
         this.parentWindow = holder;
 
-        //TODO: This is buggy
         setPreventClose(true);
     }
 
+    /**
+     * Reloads all the Items in the inventory, as well as sets the toolbar and the spacer again
+     */
     public void reloadItems() {
         List<GuiItem> ownItems = parentWindow.getTradeItems().getOwnItems(player);
         List<GuiItem> otherItems = parentWindow.getTradeItems().getOtherItems(player);
@@ -40,6 +48,9 @@ public class TradeWindow extends ChestWindow {
         setSpacer();
     }
 
+    /**
+     * Sets the toolbar at the bottom of the window again
+     */
     public void setToolbar() {
         TradeToolbar toolbar = parentWindow.getToolbar();
         boolean[] partiesReady = parentWindow.getArePartiesReady(player);
@@ -51,6 +62,9 @@ public class TradeWindow extends ChestWindow {
         }
     }
 
+    /**
+     * Sets the spacer inbetween the trade offers
+     */
     public void setSpacer() {
         GuiItem spacerItem = new GuiItem(parentWindow.getSpacerItem());
         for (int i = 4; i < 9 * 5; i += 9) {
@@ -58,12 +72,18 @@ public class TradeWindow extends ChestWindow {
         }
     }
 
+    /**
+     * Gets the next free slot on the left hand side of the window
+     */
     public int getNextFreeSlot() {
         List<GuiItem> items = parentWindow.getTradeItems().getOwnItems(player);
         int nextFreeSlot = ((Math.floorDiv(items.size(), 4) * 9) + (items.size() % 4));
         return items.size() < 5 * 4 ? nextFreeSlot : -1;
     }
 
+    /**
+     * @return The Player that views this inventory
+     */
     public Player getPlayer() {
         return player;
     }

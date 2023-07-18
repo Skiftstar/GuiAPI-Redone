@@ -62,6 +62,15 @@ public class TradeToolbar {
         this.notReadyIndicatorText = TextUtil.color(notReadyIndicatorText);
     }
 
+    /**
+     * 
+     * @param window The parent {@link TradeWinderHolder}
+     * @param windowHolder The player of the {@link TradeWindow#getPlayer()}
+     * @param ownPartyReady Whether or not said player is ready
+     * @param otherPartyReady Whether or not the other player is ready
+     * @param gui the {@link GUI} all of the Windows belong to
+     * @return an Item of Arrays with length 9 ordered by how they should be set in the inventory
+     */
     public GuiItem[] buildTradeToolBar(TradeWindowHolder window, Player windowHolder, boolean ownPartyReady, boolean otherPartyReady, GUI gui) {
         GuiItem[] items = new GuiItem[9];
 
