@@ -22,7 +22,7 @@ public class GUI {
     public GUI(Player holder, JavaPlugin plugin) {
         this.holder = holder;
         this.plugin = plugin;
-        this.listener = new WindowListener(plugin);
+        this.listener = new WindowListener(plugin, this);
     }
 
     /**
@@ -42,6 +42,20 @@ public class GUI {
         // Set cached value for previous Window
         if (oldWindow != null) {
             oldWindow.setIgnoreCloseEvent(cachedIgnoreCloseEvent);
+        }
+    }
+
+    /**
+     * 
+     * Closes current Window
+     */
+    public void closeCurrent() {
+        boolean cachedIgnoreCloseEvent = currentWindow == null ? false : currentWindow.isIgnoreCloseEvent();
+        if (currentWindow != null) {
+            currentWindow.setIgnoreCloseEvent(true);
+            holder.closeInventory();
+            currentWindow.setIgnoreCloseEvent(cachedIgnoreCloseEvent);
+            unregisterListener();
         }
     }
 

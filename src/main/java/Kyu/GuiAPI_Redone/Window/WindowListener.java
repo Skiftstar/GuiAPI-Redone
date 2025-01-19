@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import Kyu.GuiAPI_Redone.GUI;
 import Kyu.GuiAPI_Redone.Item.GuiItem;
 
 /**
@@ -17,9 +18,11 @@ import Kyu.GuiAPI_Redone.Item.GuiItem;
 public class WindowListener implements Listener {
 
     private JavaPlugin plugin;
+    private GUI connectedGUI;
 
-    public WindowListener(JavaPlugin plugin) {
+    public WindowListener(JavaPlugin plugin, GUI gui) {
         this.plugin = plugin;
+        this.connectedGUI = gui;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -66,6 +69,11 @@ public class WindowListener implements Listener {
 
         if (clickedWindow.isDisableClickEvent()) {
             e.setCancelled(true);
+        }
+
+        if (!clickedWindow.getGui().equals(connectedGUI)) {
+            e.setCancelled(true);
+            return;
         }
 
         int slot = e.getSlot();
