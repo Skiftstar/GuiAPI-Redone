@@ -47,7 +47,7 @@ public class GUI {
 
         /**
      * 
-     * @param window {@link Openable} to open
+     * Closes current Windows and unregisters Listener
      */
     public void closeCurrent() {
         boolean cachedIgnoreCloseEvent = currentWindow == null ? false : currentWindow.isIgnoreCloseEvent();
