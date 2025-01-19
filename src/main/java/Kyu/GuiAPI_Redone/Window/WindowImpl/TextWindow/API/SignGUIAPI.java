@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -70,13 +71,15 @@ public final class SignGUIAPI {
 
         this.sign = (Sign)player.getWorld().getBlockAt(x_start, y_start, z_start).getState();
 
+        SignSide side = this.sign.getTargetSide(player);
+
         int i = 0;
         for(String line : lines){
-            this.sign.line(i, Component.text(line));
+            side.line(i, Component.text(line));
             i++;
         }
 
-        this.sign.update(false, false);
+        // this.sign.update(false, false);
 
 
         PacketContainer openSign = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.OPEN_SIGN_EDITOR);
